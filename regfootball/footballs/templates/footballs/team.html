@@ -1,0 +1,33 @@
+{% extends 'base.html'%}
+
+{% block page_header %}
+  <h1><img src="{{ team.logotype.url }}" width="100"> {{ team }}</h1>
+{% endblock page_header %}
+
+{% block content %}
+
+  <div class="card mb-3">
+     <h4 class="card-header">{{ team.team_full_name }}</h4>
+     <div class="card-body">
+        <lu>
+         <li>{{ team.region_id }} область
+             {% if team.town %}
+               --> місто: {{ team.town}}
+             {% endif %}</li>
+         {% if team.born %}<li>Рік заснування: {{ team.born }}</li>{% endif %}
+         {% if team.address %}<li>Домашній стадіон: {{ team.address }}</li>{% endif %}
+         {% if team.stadium %}<li>Адреса: {{ team.stadium }}</li>{% endif %}
+         {% if team.link %}<li>Посилання на офіційний сайт:  <a href="{{ team.link }}">сайт</a></li>{% endif %}
+         {% if team.description %}<li>{{ team.description }}</li>{% endif %}
+        </lu>
+      </div>
+  </div>
+
+  <p><button name="submit">
+    <a href="{% url 'footballs:edit_team' team.team_slug %}">Редагувати</a>
+  </button></p>
+
+{% include 'footballs/includes/match_list.html' %}
+
+{% endblock content %}
+

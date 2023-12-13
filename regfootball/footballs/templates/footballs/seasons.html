@@ -1,0 +1,24 @@
+{% extends 'base.html'%}
+
+{% block page_header %}
+  <h3>Сезони:</h3>
+{% endblock page_header %}
+
+
+{% block content %}
+  <ul>
+    {% for season in seasons %}
+
+        <li><h5>
+          <a href="">{{ season }}</a>
+        </h5></li>
+
+    {% empty %}
+      <li><h3>Жодного турніру не знайдено</h3></li>
+    {% endfor %}
+  </ul>
+  <br>
+
+<!--    <h6><a href="{% url 'footballs:new_team' %}">Додати нову команду</a></h6>-->
+
+{% endblock content %}

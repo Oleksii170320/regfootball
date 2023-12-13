@@ -1,0 +1,20 @@
+{% extends 'base.html'%}
+
+{% block page_header %}
+{% endblock page_header %}
+
+
+{% block content %}
+
+{% include 'footballs/includes/match_list.html' %}
+
+
+
+  <h6><a href="{% url 'footballs:new_match' %}">Додати новий матч</a></h6>
+
+
+
+
+
+
+{% endblock content %}

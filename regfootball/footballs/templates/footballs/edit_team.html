@@ -1,0 +1,21 @@
+{% extends 'base.html'%}
+{% load bootstrap4 %}
+
+{% block page_header %}
+  <h2>Редагувати дані:</h2>
+{% endblock page_header %}
+
+
+{% block content %}
+
+  <h6><a href="{% url 'footballs:team' team.team_slug %}">{{ team  }}</a></h6>
+
+    <form action="{% url 'footballs:edit_team' team.team_slug %}" enctype="multipart/form-data" method='post' form method="post">
+        {% csrf_token %}
+        {% bootstrap_form form %}
+        {% buttons %}
+        <button name="submit" class="btn btn-primary">Зберегти зміни</button>
+        {% endbuttons %}
+    </form>
+
+{% endblock content %}

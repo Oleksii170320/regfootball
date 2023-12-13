@@ -1,0 +1,23 @@
+{% extends 'base.html'%}
+
+{% block page_header %}
+  <h3>Список турнірів:</h3>
+{% endblock page_header %}
+
+{% block content %}
+  <ul>
+    {% for tournament in tournaments %}
+
+        <lo><h5>
+          <a href="{{ tournament.get_absolute_url }}">
+            <img src="{{ tournament.tournament_id.logotype.url }}" width="50">
+            {{ tournament.tournament_id }}-{{ tournament.season }}
+          </a>
+        </h5></lo>
+
+    {% empty %}
+      <lo><h5>Жодного турніру не знайдено.</h5></lo>
+    {% endfor %}
+  </ul>
+  <br>
+{% endblock content %}

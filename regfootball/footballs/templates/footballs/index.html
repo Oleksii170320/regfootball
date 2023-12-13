@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+
+{% block page_header %}
+  <div class="jumbotron">
+    <h3 class="display-3">Головна сторінка</h3>
+
+    <p><h6> Даний сай створено для огляду висвітлення футбольних та футзальних аматорських турнірів Сумської області,
+    які проводятся під егідою отранізацій:</h6></p>
+    <lu>
+      <li><strong>  Асоціації футболу Сумської області (АФСО)</strong></li>
+      <li><strong>  Асоціації футзалу Сумщини (АФС)</strong></li>
+      <li><strong>  Федерації футзалу міста Суми (ФФС)</strong></li>
+      <li><strong>  Районні федерації та асоціації футболу</strong></li>
+    </lu>
+    <br>
+    <a class="btn btn-lg btn-primary" href="{% url 'users:register' %}" role="button">Реєстрація &raquo</a>
+</div>
+
+
+{% endblock page_header %}

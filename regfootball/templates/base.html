@@ -1,0 +1,94 @@
+{% load bootstrap4 %}
+{% load sumyfootball_tags %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <title>{{ title }}</title>
+  <style>
+    a {
+      text-decoration: none
+    }
+  </style>
+
+  {% bootstrap_css %}
+  {% bootstrap_javascript jquery='full' %}
+</head>
+
+
+<body>
+  <nav class="navbar navbar-expand-md navbar-light bg-light mb-4 border">
+
+    <a class="navbar-brand" href="{% url 'footballs:index' %}">Головна сторінка</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse"
+      aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navbarCollapse">
+      <ul class="navbar-nav mr-auto">
+        <li class="nav-item"><a class="nav-link" href="{% url 'footballs:tournaments_season' %}">Сезон {% now "Y" %}</a></li>
+        <li class="nav-item"><a class="nav-link" href="{% url 'footballs:teams' %}">Команди</a></li>
+        <li class="nav-item"><a class="nav-link" href="{% url 'footballs:matches' %}">Матчі</a></li>
+        <li class="nav-item"><a class="nav-link" href="{% url 'footballs:tournaments_list' %}">Турніри</a></li>
+        <li class="nav-item"><a class="nav-link" href="">Структура</a></li>
+        <li class="nav-item"><a class="nav-link" href="">Сезон</a></li>
+        <li class="nav-item"><a class="nav-link" href="">Розіграш</a></li>
+      </ul>
+
+      <ul class="navbar-nav ml-auto">
+
+        {% if user.is_authenticated %}
+           <li class="nav-item">
+            <span class="navbar-text"><strong>Зараз {% now "SHORT_DATETIME_FORMAT" %} | </strong></span>
+          </li>
+          <li class="nav-item">
+            <span class="navbar-text">Hello, <strong>{{ user.username|title }}</strong>.</span>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'users:logout' %}">Вихід</a>
+          </li>
+        {% else %}
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'users:register' %}">Реєстрація</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'users:login' %}">Вхід</a>
+          </li>
+        {% endif %}
+      </ul>
+    </div>
+  </nav>
+
+
+  <main role="main" class="container">
+    <div class="pb-2 mb-2 border-bottom">
+      {% block page_header %} {% endblock page_header %}
+    </div>
+
+    <div>
+      {% block content %} {% endblock content %}
+    </div>
+  </main>
+
+  <div class="navbar navbar-expand-md navbar-light bg-light mb-4 border">
+	<div class="fix">
+	  <div class="fblock-1">
+		<p>40000, Україна, м. Суми,	вул. Євгена Коростильова, 9</p>
+	  </div>
+	  <div class="fblock-2">
+		<p>
+		  E-mail: <a href="/cdn-cgi/l/email-protection#086e6e7b267a6d6f616766486f65696164266b6765"><span class="__cf_email__" data-cfemail="76101005580413111f191836111b171f1a5815191b">[email&#160;protected]</span></a>
+		</p>
+	  </div>
+	  <div class="fblock-3">
+			 <p><span>Дзвонiть</span> +38 (0542) 650-442</p>
+	  </div>
+    </div>
+	<div class="clr"></div>
+  </div>
+
+</body>
+</html>

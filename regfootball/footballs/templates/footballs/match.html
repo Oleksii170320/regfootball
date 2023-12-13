@@ -1,0 +1,24 @@
+{% extends 'base.html'%}
+{% load bootstrap4 %}
+
+{% block page_header %}
+<!--  <h1><img src="{{ team.logotype.url }}" width="100"> {{ team }}</h1>-->
+{% endblock page_header %}
+
+{% block content %}
+
+  <div class="card mb-3">
+     <div class="card-body">
+      <lu>
+         <li>Турнір: <a href="">{{ match.mtournament_id }}</a></li>
+         <li>Матч {{ match.round_id }} туру</li>
+         <li>Дата: {{ match.match_date }}</li>
+         <li>Стадіон: </li>
+         <li>Мачт: {{ match.match_home }} |{{ match.host_team_goals }} : {{ match.visiting_team_goals }}| {{ match.match_guests }}</li>
+        </lu>
+     </div>
+  </div>
+
+
+{% endblock content %}
+

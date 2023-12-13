@@ -1,0 +1,22 @@
+{% extends 'base.html'%}
+
+{% block page_header %}
+  <h3>Список команд:</h3>
+{% endblock page_header %}
+
+
+{% block content %}
+  <ul>
+    {% for team in teams %}
+      <li><h5>
+        <a href="{{ team.get_absolute_url }}">{{ team }}</a>
+      </h5></li>
+    {% empty %}
+      <li><h3>Жодної команди не знайдено.</h3></li>
+    {% endfor %}
+  </ul>
+  <br>
+
+    <h6><a href="{% url 'footballs:new_team' %}">Додати нову команду</a></h6>
+
+{% endblock content %}

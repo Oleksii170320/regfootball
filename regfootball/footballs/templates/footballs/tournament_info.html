@@ -1,0 +1,27 @@
+{% extends 'base.html'%}
+
+{% block page_header %}
+  <h3><img src="{{ tournament.logotype.url }}" width="100"> {{ tournament.full_name }}</h3>
+{% endblock page_header %}
+
+{% block content %} <!-- Блок контент -->
+
+
+   <div class="card mb-3">
+    <h5 class="card-header">Загальна інформація турніру: {{ tournament.full_name }}</h5>
+    <div class="card-body">
+      <lu>
+        <li><i>Організація</i>: {{ tournament.full_name }}({{ tournament.association_id }})</li>
+        <li><i>Посилання на офіційний сайт</i>: <a href="{{ tournament.link }}">Перейти на сайт --></a></li>
+        <li><i>Короткий опис турніру</i>: {{ tournament.description }}</li>
+      </lu>
+    </div>
+  </div>                            <!-- Блок: Інформація про турнір -->
+
+  <p><button name="submit">
+    <a href="{% url 'footballs:edit_tournament' tournament.tournament_slug %}">Редагувати</a>
+  </button></p>
+
+
+
+{% endblock content %}

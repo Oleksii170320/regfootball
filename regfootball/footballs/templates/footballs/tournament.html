@@ -1,0 +1,77 @@
+{% extends 'base.html'%}
+
+{% block page_header %}
+  <h3><img src="{{ tournament.logotype.url }}" width="100"> {{ tournament.full_name }}</h3>
+{% endblock page_header %}
+
+{% block content %} <!-- Блок контент -->
+
+
+  <div class="card-body" align="center">
+
+    {% for team in teams %}
+      <a href="{% url 'footballs:team' team.team_slug %}">
+        <img height="70" src="{{ team.logotype.url }}"/>
+      </a>
+    {% endfor %}
+
+  </div>                                              <!-- Блок: Лого команд-учасниць -->
+
+  {% if print_table %}
+  <div class="card mb-3">
+    <h5 class="card-header">Турнірна таблиця</h5>
+    <div class="card-body">
+      <div class="sp-table-wrapper">
+        {% if print_table %}
+        <table class="table table-striped table-hover">
+          <thead class="table-primary">
+            <tr>
+              <th class="data-rank">№</th>
+              <th class="data-logo"></th>
+              <th class="data-name">Команда</th>
+              <th class="data-p">І</th>
+              <th class="data-twoeightfivenine">В</th>
+              <th class="data-twoeightsixzero">Н</th>
+              <th class="data-twoeightsixone">П</th>
+              <th class="data-twoeightsixtwo"  align="center" width="100">МЗ-МП</th>
+              <th class="data-twoeightsixfour">Р</th>
+              <th class="data-twoeightsixfive">О</th>
+            </tr>
+          </thead>
+
+          {% for standing in standings|dictsortreversed:'team_o' %}
+            <tr>
+              <td class="data-rank">{{ forloop.counter }}</td>
+              <td class="data-logo">
+                <a href="{% url 'footballs:team' standing.team.team_slug %}">
+                  <img height="40" src="{{ standing.team.logotype.url }}"/>
+                </a>
+              </td>
+              <td class="data-name" >
+                  <a href="{% url 'footballs:team' standing.team.team_slug %}">
+                    <strong>{{ standing.team }}</strong>
+                  </a>
+              </td>
+              <td class="data-p">{{ standing.team_i }}</td>
+              <td class="data-twoeightfivenine">{{ standing.team_v }}</td>
+              <td class="data-twoeightsixzero">{{ standing.team_n }}</td>
+              <td class="data-twoeightsixone">{{ standing.team_p }}</td>
+              <td class="data-twoeightsixtwo" align="center">{{ standing.team_zm }}-{{ standing.team_pm }}</td>
+              <td class="data-twoeightsixfour">{{ standing.team_rm }}</td>
+              <td class="data-twoeightsixfive">{{ standing.team_o }}</td>
+            </tr>
+          {% empty %}
+            <li><h6>Жодної команди не знайдено.</h6></li>
+          {% endfor %}
+        </table>
+        {% endif %}
+     </div>
+    </div>
+  </div>                            <!-- Блок: Турнірна таблиця -->
+  {% endif %}
+
+{% include 'footballs/includes/match_list.html' %}  <!-- Блок: Результати/календар матчів -->
+
+
+
+{% endblock content %}

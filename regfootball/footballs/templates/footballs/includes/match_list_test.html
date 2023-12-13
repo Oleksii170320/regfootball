@@ -1,0 +1,93 @@
+  <div class="card mb-3">
+    <h4 class="card-header">Результати матчів:</h4>
+    <div class="card-body">
+      <article class="game-feed match-center" id="matchCenterBlock">
+
+
+        {% for round in tours_unique %}
+          <h5 class="card-header">{{ round }}</h5>
+
+                  <table class="table table-striped table-hover">
+
+                    {% for match in matches %}         <!-- Розполіл на матчі в турах -->
+                      {% if round.id == match.round_id.id %}
+
+                          <tr id="match_id_{{ match.id }}">
+
+                            {% if legue %}
+                              <td class="tournament_name">
+                                <strong>{{ match.tournament_id}}</strong>
+                              </td>
+                            {% endif %}
+
+                            {% if name_tour %}
+                              <td class="round">
+                                <strong>{{ match.round_id }}</strong>
+                              </td>
+                            {% endif %}
+
+                            <td class="day-date" width="120">
+                              {{ match.match_date|date:'l - d.m.y' }}
+                            </td>
+
+                            <td class="time" width="40">
+                              {{ match.match_time|time:"G:i" }}
+                            </td>
+
+		                    <td class="left-team" width="160" align="right">
+                              <a href="{% url 'footballs:team' match.host_team_id.team_slug %}">
+                                 {{ match.host_team_id }}
+                              </a>
+                            </td>
+
+                            <td class="left-logo" width="40" align="center">
+                              <a href="{% url 'footballs:team' match.host_team_id.id %}">
+                                <img src="{{ match.host_team_id.logotype.url }}" height="30">
+                              </a>
+                            </td>
+
+		                     <td class="score" width="60" align="center" >
+                               <div class="score-holder">
+                                 <a href="{% url 'footballs:match' match.id %}">
+                                  {% if match.host_team_goals == None %}
+                                     <strong>- : -</strong>
+                                   {% else %}
+                                     <strong>{{ match.host_team_goals }}:{{ match.visiting_team_goals }}</strong>
+                                   {% endif %}
+                                </a>
+                               </div>
+                             </td>
+
+                            <td class="left-logo" width="40"  align="center">
+                              <a href="{% url 'footballs:team' match.visiting_team_id.id %}">
+                                <img src="{{ match.visiting_team_id.logotype.url }}" height="30">
+                              </a>
+                            </td>
+
+		                    <td class="right-team" width="160">
+                              <a href="{% url 'footballs:team' match.visiting_team_id.team_slug %}">
+                                {{ match.visiting_team_id }}
+                              </a>
+                            </td>
+
+                            {% if button %}
+<!--                          <td class="edit-matcm">-->
+<!--                            <a href="{% url 'footballs:match' match.id %}">-->
+<!--                              <button class="">Переглянути</button>-->
+<!--                            </a>-->
+<!--                          </td>-->
+
+                              <td class="edit-matcm">
+                                <a href="{% url 'footballs:edit_match' match.id %}">
+                                  <button class="">Редагувати</button>
+                                </a>
+                              </td>
+                            {% endif %}
+                          </tr>  <!-- Таблиця з матчами -->
+                      {% endif %}
+                    {% endfor %}
+                  </table>
+        {% endfor %}
+      </article> <!--match-center--><div class='separator'></div>
+    </div>
+  </div>

@@ -102,16 +102,16 @@ def edit_team(request, team_slug):
 
 
 def tournaments_season(request):
-    tournaments_list = TournamentTables.objects.all()
+    tournaments = TournamentTables.objects.all()
 
     context = {
         'title': "Турніри",
-        'tournaments': tournaments_list,
+        'tournaments': tournaments,
     }
     return render(request, 'footballs/tournaments_season.html', context)
 
 
-def tournament(request, region_id, tournament_slug, season_year):
+def tournament(request, region_slug, tournament_slug, season_year):
     tournament = Tournaments.objects.get(tournament_slug=tournament_slug)  # визначення турніру
     tournament_id = tournament.id
     table = TournamentTables.objects.get(
@@ -248,7 +248,6 @@ def tournament(request, region_id, tournament_slug, season_year):
 
 def tournaments_list(request):
     tournaments_list = Tournaments.objects.order_by('date_create')
-    # table_list = TournamentTables.objects.all()
 
     context = {
         'title': "Турніри",
@@ -304,24 +303,43 @@ def edit_tournament(request, tournament_slug):
 
 
 def matches(request):
-    matches = Matches.objects.order_by('-match_date', 'tournament_id', 'match_time')
+    matches = Matches.objects.values(
+        'id',
+        'tournament_id__name',
+        'tournament_id__id',
+        'round_id__round',
+        'round_id__id',
+        'match_date',
+        'match_time',
+        'host_team_id__team',
+        'host_team_id__team_slug',
+        'host_team_id__id',
+        'host_team_id__logotype',
+        'host_team_goals',
+        'visiting_team_goals',
+        'visiting_team_id__team',
+        'visiting_team_id__team_slug',
+        'visiting_team_id__id',
+        'visiting_team_id__logotype',
+        'status'
+    ).order_by('-match_date', 'match_time')
 
-    tournams = set({})  # Визначає всі турніри сесону
+    tournaments = set()  # Визначає всі турніри сесону
     for i in matches:
-        tournams.add(i.tournament_id)
+        tournaments.add(i['tournament_id__name'])
 
-    tours = set({})  # Визначає всі тури сесону
+    rounds = set()  # Визначає всі тури сесону
     for i in matches:
-        tours.add(i.round_id)
+        rounds.add(i['round_id__round'])
 
     context = {
         'title': "Матчі сезону",
-        'tournams': tournams,
         'matches': matches,
-        'tours': tours,
+        'tournaments': sorted(tournaments),
+        'rounds': sorted(rounds),
         'button': False,  # Видимість кнопки "Редагувати матч"
-        'tour_title': False,  # Видимість "Назви туру" в заголовку
-        'tour_match': True,  # Видимість "Назви туру" в матчі
+        'round_title': False,  # Видимість "Назви туру" в заголовку
+        'round_match': True,  # Видимість "Назви туру" в матчі
         'league_title': True,  # Видимість "Назви турніру"
         'league_match': False,  # Видимість "Назви турніру" в матчі
     }

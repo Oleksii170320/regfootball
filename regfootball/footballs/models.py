@@ -20,6 +20,10 @@ class Rounds(models.Model):
     def __str__(self):
         return f'{self.round}'
 
+    class Meta:
+        verbose_name = "Раунд"
+        verbose_name_plural = "Раунди"
+
 
 class Regions(models.Model):
     name = models.CharField(max_length=100, blank=True, verbose_name="Область", unique=True)
@@ -34,36 +38,11 @@ class Regions(models.Model):
         verbose_name_plural = "Області"
 
 
-class Associations(models.Model):
-    association_slug = models.SlugField(max_length=250, unique=True, db_index=True, verbose_name="Slug")
-    association = models.CharField(max_length=20, verbose_name="Організація", unique=True)
-    association_full_name = models.CharField(max_length=100, blank=True, verbose_name="Повна назва організації")
-    region_id = models.ForeignKey(Regions, on_delete=models.DO_NOTHING, verbose_name="Область")
-    district = models.CharField(max_length=100, blank=True, verbose_name="Район")
-    county = models.CharField(max_length=100, blank=True, verbose_name="Територіальна громада")
-    description = models.TextField(blank=True, verbose_name="Опис")
-    emblem = models.ImageField(upload_to='footballs/static/footballs/img/logo_association/', verbose_name="Логотип",
-                               blank=True, default='footballs/static/footballs/img/logo_teams/Снимок.PNG')
-    date_create = models.DateTimeField(auto_now_add=True)
-    date_update = models.DateTimeField(auto_now=True)
-
-    def __str__(self):
-        return self.association_id
-
-    class Meta:
-        verbose_name = "Асоціація"
-        verbose_name_plural = "Асоціації"
-
-    def save(self, *args, **kwargs):
-        self.association_slug = slugify(translit_to_eng(self.association_slug))
-        super().save(*args, **kwargs)
-
-
 class Tournaments(models.Model):
     tournament_slug = models.SlugField(max_length=250, unique=True, db_index=True, verbose_name="Slug")
     name = models.CharField(max_length=150, verbose_name="Назва турніру", unique=True)
     full_name = models.CharField(max_length=350, verbose_name="Повна назва турніру")
-    association_id = models.ForeignKey(Associations, on_delete=models.DO_NOTHING, verbose_name="Огранізація проведення")
+    region = models.ForeignKey(Regions, on_delete=models.DO_NOTHING, verbose_name="Область")
     description = models.TextField(blank=True, verbose_name="Опис")
     link = models.URLField(blank=True, verbose_name="посилання на офіційний сайт")
     logotype = models.ImageField(upload_to='footballs/static/footballs/img/logo_tournaments/', verbose_name="Логотип",
@@ -88,7 +67,7 @@ class Teams(models.Model):
     team_slug = models.SlugField(max_length=250, unique=True, db_index=True, verbose_name="Slug")
     team = models.CharField(max_length=80, verbose_name="Назва команди")
     team_full_name = models.CharField(max_length=200, blank=True, verbose_name="Повна назва")
-    region_id = models.ForeignKey(Regions, on_delete=models.DO_NOTHING, verbose_name="Область")
+    region = models.ForeignKey(Regions, on_delete=models.DO_NOTHING, verbose_name="Область")
     town = models.CharField(max_length=100, blank=True, verbose_name="Місто")
     address = models.CharField(max_length=350, blank=True, verbose_name="Адреса клубу/команди")
     link = models.URLField(blank=True, verbose_name="посилання на офіційний сайт")
@@ -126,7 +105,7 @@ class Teams(models.Model):
 
 
 class TournamentTables(models.Model):
-    region_id = models.ForeignKey(Regions, on_delete=models.PROTECT, verbose_name="Область")
+    region = models.ForeignKey(Regions, on_delete=models.PROTECT, verbose_name="Область")
     tournament_id = models.ForeignKey(Tournaments, on_delete=models.PROTECT, verbose_name="Назва турніру")
     season = models.CharField(max_length=10, verbose_name='Сезон')
     team_id = models.ManyToManyField(Teams, related_name='teams', verbose_name="Команди")
@@ -134,7 +113,7 @@ class TournamentTables(models.Model):
     date_update = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return f'{self.region_id} - {self.tournament_id} {self.season}'
+        return f'{self.region} - {self.tournament_id} {self.season}'
 
     class Meta:
         verbose_name = "Турнірна таблиця сезону"
@@ -142,7 +121,7 @@ class TournamentTables(models.Model):
 
     def get_absolute_url(self):
         return reverse('footballs:tournament', kwargs={
-            'region_id': self.region_id.region_slug,
+            'region_slug': self.region.region_slug,
             'tournament_slug': self.tournament_id.tournament_slug,
             'season_year': self.season,
         })

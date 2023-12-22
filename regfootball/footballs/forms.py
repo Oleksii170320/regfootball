@@ -7,7 +7,7 @@ class TeamsForm(forms.ModelForm):
     class Meta:
         model = TournamentTables
         fields = [
-            'region_id',
+            'region',
         ]
         widgets = {
             'description': forms.Textarea(attrs={'cols': 80, 'rows': 10}),
@@ -20,7 +20,6 @@ class TournamentsForm(forms.ModelForm):
         fields = [
             'name',
             'full_name',
-            'association_id',
             'description',
             'link',
             'logotype',

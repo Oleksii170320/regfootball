@@ -1,0 +1,95 @@
+<div class="card mb-3">
+  <h4 class="card-header">Результати матчів:</h4>
+
+  {% for tournament in tournaments %}
+    <div class="card-body">
+      <article class="game-feed match-center" id="matchCenterBlock">
+          {% if league_title %}<h5 class="card-header">{{ tournament }}</h5>{% endif %}
+
+          {% for round in rounds %}
+            {% if round_title %}<h6 class="card-header">{{ round }}</h6>{% endif %}<!-- Розподіл на тури -->
+
+              <table class="table table-striped table-hover">
+                {% for match in matches %}         <!-- Розполіл на матчі в турах -->
+                  {% if tournament == match.tournament_id__name and round == match.round_id__round %}    <!-- Фільтр по турнірах  -->
+                    <tr id="match_id {{ match.id }}">
+
+                      {% if league_match %}
+                          <td class="legue" width="100">
+                            <strong>{{ match.tournament_id__name }}</strong>
+                          </td>
+                      {% endif %}
+
+                      {% if round_match %}
+                          <td class="round" width="60">
+                            <strong>{{ match.round_id__round }}</strong>
+                          </td>
+                      {% endif %}
+
+                        <td class="day-date" width="120">
+                          {{ match.match_date|date:'l - d.m.y' }}
+                        </td>
+
+                        <td class="time" width="30">
+                          {{ match.match_time|time:"G:i" }}
+                        </td>
+
+                        <td class="left-team" width="160" align="right">
+                          <a href="{% url 'footballs:team' match.host_team_id__team_slug %}">
+                            {{ match.host_team_id__team }}
+                          </a>
+                        </td>
+
+                        <td class="left-logo" width="40" align="center">
+                          <a href="{% url 'footballs:team' match.host_team_id__id %}">
+                            <img src="{{ match.host_team_id__logotype.url }}" height="30">
+                          </a>
+                        </td>
+
+		                <td class="score" width="60" align="center" >
+                          <div class="score-holder">
+                            <a href="{% url 'footballs:match' match.id %}">
+                              {% if match.host_team_goals == None %}
+                                <strong>- : -</strong>
+                              {% else %}
+                                <strong>{{ match.host_team_goals }}:{{ match.visiting_team_goals }}</strong>
+                              {% endif %}
+                            </a>
+                          </div>
+                        </td>
+
+                        <td class="left-logo" width="40"  align="center">
+                          <a href="{% url 'footballs:team' match.visiting_team_id__id %}">
+                            <img src="{{ match.visiting_team_id__logotype.url }}" height="30">
+                          </a>
+                        </td>
+
+                        <td class="right-team" width="160">
+                          <a href="{% url 'footballs:team' match.visiting_team_id__team_slug %}">
+                            {{ match.visiting_team_id__team }}
+                          </a>
+                        </td>
+
+                      {% if button %}
+<!--                      <td class="edit-matcm">-->
+<!--                        <a href="{% url 'footballs:match' match.id %}">-->
+<!--                          <button class="">Переглянути</button>-->
+<!--                        </a>-->
+<!--                     </td>-->
+
+                          <td class="edit-matcm">
+                            <a href="">
+                              <button class="">Редагувати</button>
+                            </a>
+                          </td>
+                      {% endif %}
+                    </tr>  <!-- Таблиця з матчами -->
+                  {% endif %}
+                {% endfor %}
+              </table>
+          {% endfor %}
+       </article> <!--match-center--><div class='separator'></div>
+    </div>
+  {% endfor %}
+</div>
+

@@ -3,8 +3,6 @@
   {% for tournament in tournament_unique %}         <!-- Розподіл на турніри -->
     <div class="card-body">
       <article class="game-feed match-center" id="matchCenterBlock">
-
-
           {% if league_title %}<h5 class="card-header">{{ tournament.name }}</h5>{% endif %}
 
           {% for round in tours_unique %}                      <!-- Розподіл на тури -->
@@ -36,7 +34,7 @@
                             </td>
 
 		                    <td class="left-team" width="160" align="right">
-                              <a href="{% url 'footballs:team' match.host_team_id.team_slug %}">
+                              <a href="{% url 'footballs:team' match.host_team.team_slug %}">
                                  {{ match.host_team_id }}
                               </a>
                             </td>

@@ -10,19 +10,19 @@
 
                   <table class="table table-striped table-hover">
                     {% for match in matches %}         <!-- Розполіл на матчі в турах -->
-                      {% if tournament.id == match.tournament_id.id and round.id == match.round_id.id %}    <!-- Фільтр по турнірах  -->
+                      {% if tournament.id == match.tournament.id and round.id == match.round.id %}    <!-- Фільтр по турнірах  -->
 
                           <tr id="match_id_{{ match.id }}">
 
                             {% if league_match %}
                               <td class="legue" width="100">
-                               <strong>{{ match.tournament_id}}</strong>
+                               <strong>{{ match.tournament}}</strong>
                               </td>
                             {% endif %}
 
                             {% if tour_match %}
                               <td class="round" width="60">
-                                <strong>{{ match.round_id }}</strong>
+                                <strong>{{ match.round }}</strong>
                               </td>
                             {% endif %}
                                <td class="day-date" width="120">
@@ -35,13 +35,13 @@
 
 		                    <td class="left-team" width="160" align="right">
                               <a href="{% url 'footballs:team' match.host_team.team_slug %}">
-                                 {{ match.host_team_id }}
+                                 {{ match.host_team }}
                               </a>
                             </td>
 
                             <td class="left-logo" width="40" align="center">
-                              <a href="{% url 'footballs:team' match.host_team_id.id %}">
-                                <img src="{{ match.host_team_id.logotype.url }}" height="30">
+                              <a href="{% url 'footballs:team' match.host_team.id %}">
+                                <img src="{{ match.host_team.logotype.url }}" height="30">
                               </a>
                             </td>
 
@@ -58,14 +58,14 @@
                              </td>
 
                             <td class="left-logo" width="40"  align="center">
-                              <a href="{% url 'footballs:team' match.visiting_team_id.id %}">
-                                <img src="{{ match.visiting_team_id.logotype.url }}" height="30">
+                              <a href="{% url 'footballs:team' match.visiting_team.id %}">
+                                <img src="{{ match.visiting_team.logotype.url }}" height="30">
                               </a>
                             </td>
 
 		                    <td class="right-team" width="160">
-                              <a href="{% url 'footballs:team' match.visiting_team_id.team_slug %}">
-                                {{ match.visiting_team_id }}
+                              <a href="{% url 'footballs:team' match.visiting_team.team_slug %}">
+                                {{ match.visiting_team }}
                               </a>
                             </td>
 

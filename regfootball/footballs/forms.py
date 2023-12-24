@@ -34,10 +34,10 @@ class MatchesForm(forms.ModelForm):
         fields = [
             'match_date',
             'match_time',
-            'tournament_id',
-            'host_team_id',
+            'tournament',
+            'host_team',
             'host_team_goals',
-            'visiting_team_id',
+            'visiting_team',
             'visiting_team_goals',
             'status',
         ]

@@ -32,17 +32,17 @@ def teams(request):
 
 def team(request, team_slug):
     team = get_object_or_404(Teams, team_slug=team_slug)
-    # team_id = team.id
-    # matches = Matches.objects.filter(Q(match_team_home_id=team_id) | Q(visiting_team_id=team_id)).order_by(
+    # team = team.id
+    # matches = Matches.objects.filter(Q(match_team_home_id=team) | Q(visiting_team=team)).order_by(
     #     '-match_date')
     #
     # tournams = set({})
     # for i in matches:
-    #     tournams.add(i.tournament_id)
+    #     tournams.add(i.tournament)
     #
     # tours = set({})  # Визначає всі тури сесону
     # for i in matches:
-    #     tours.add(i.round_id)
+    #     tours.add(i.round)
 
     context = {
         'title': team.team,
@@ -112,25 +112,25 @@ def tournaments_season(request):
 
 
 def tournament(request, region_slug, tournament_slug, season_year):
-    tournament = Tournaments.objects.get(tournament_slug=tournament_slug)  # визначення турніру
-    tournament_id = tournament.id
+    tournaments = Tournaments.objects.get(tournament_slug=tournament_slug)  # визначення турніру
+    tournament_id = tournaments.id
     table = TournamentTables.objects.get(
-        tournament=tournament.id,
+        tournament=tournaments.id,
         season=season_year
-    ).team_id.order_by('team').all()  # визначення команд данного турніру
+    ).team.order_by('team').all()  # визначення команд данного турніру
 
-    matches = Matches.objects.filter(tournament_id=tournament_id).order_by('-match_date',
+    matches = Matches.objects.filter(tournament=tournament).order_by('-match_date',
                                                                            'match_time').all()  # визначення всіх матчів даного турніру
     tournament_unique = set()
     for i in matches:
-        tournament_unique.add(i.tournament_id)
+        tournament_unique.add(i.tournament)
 
     print_table = False  # Признак, чи потрібно виводити турнірну таблицю
 
     tours_unique = set()  # Визначає всі тури сезону
     for i in matches:
-        tours_unique.add(i.round_id)
-        if i.round_id.id < 7:
+        tours_unique.add(i.round)
+        if i.round.id < 7:
             print_table = True
         else:
             print_table = False
@@ -138,16 +138,16 @@ def tournament(request, region_slug, tournament_slug, season_year):
     rez_list = list()  # Словник таблиці результатів
     for team in table:  # кількості зіграних матчів в турнірі певною командою
         team_result = matches.filter(
-            Q(tournament_id=tournament_id)
-            & (Q(host_team_id=team.id) | Q(visiting_team_id=team.id))
+            Q(tournament_id=tournament)
+            & (Q(host_team=team.id) | Q(visiting_team=team.id))
             & Q(match_status__in=('played', 'tech_defeat')))
 
         # кількості матчів в турнірі однієї команди (дома - на виїзді)
         match_home = matches.filter(
-            Q(tournament_id=tournament_id) & Q(host_team_id=team.id) & Q(
+            Q(tournament_id=tournament) & Q(host_team=team.id) & Q(
                 match_status__in=('played', 'tech_defeat'))).all()
         match_guests = matches.filter(
-            Q(tournament_id=tournament_id) & Q(visiting_team_id=team.id) & Q(
+            Q(tournament_id=tournament) & Q(visiting_team=team.id) & Q(
                 match_status__in=('played', 'tech_defeat'))).all()
 
         # Перемінні для підрахунку перемог-нічиїх-поразок в матчах турніру
@@ -228,8 +228,8 @@ def tournament(request, region_slug, tournament_slug, season_year):
                 rez_list.remove(i)
 
     context = {
-        'title': tournament.name,
-        'tournament': tournament,
+        'title': tournaments.name,
+        'tournament': tournaments,
         'table': table,
         'tournament_unique': tournament_unique,
         'standings': new_rez_list,
@@ -305,32 +305,32 @@ def edit_tournament(request, tournament_slug):
 def matches(request):
     matches = Matches.objects.values(
         'id',
-        'tournament_id__name',
-        'tournament_id__id',
-        'round_id__round',
-        'round_id__id',
+        'tournament__name',
+        'tournament__id',
+        'round__round',
+        'round__id',
         'match_date',
         'match_time',
-        'host_team_id__team',
-        'host_team_id__team_slug',
-        'host_team_id__id',
-        'host_team_id__logotype',
+        'host_team__team',
+        'host_team__team_slug',
+        'host_team__id',
+        'host_team__logotype',
         'host_team_goals',
         'visiting_team_goals',
-        'visiting_team_id__team',
-        'visiting_team_id__team_slug',
-        'visiting_team_id__id',
-        'visiting_team_id__logotype',
+        'visiting_team__team',
+        'visiting_team__team_slug',
+        'visiting_team__id',
+        'visiting_team__logotype',
         'status'
     ).order_by('-match_date', 'match_time')
 
     tournaments = set()  # Визначає всі турніри сесону
     for i in matches:
-        tournaments.add(i['tournament_id__name'])
+        tournaments.add(i['tournament__name'])
 
     rounds = set()  # Визначає всі тури сесону
     for i in matches:
-        rounds.add(i['round_id__round'])
+        rounds.add(i['round__round'])
 
     context = {
         'title': "Матчі сезону",

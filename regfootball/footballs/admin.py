@@ -34,23 +34,23 @@ class TournamentsAdmin(admin.ModelAdmin):
 
 @admin.register(TournamentTables)
 class TournamentTablesAdmin(admin.ModelAdmin):
-    fields = ['region', 'tournament_id', 'season', 'team_id', ]
+    fields = ['region', 'tournament', 'season', 'team', ]
     list_per_page = 10
     save_on_top = True
 
 
 @admin.register(Matches)
 class MatchesAdmin(admin.ModelAdmin):
-    fields = ('tournament_id', 'match_date', 'round_id',
-              ('host_team_id', 'host_team_goals'),
-              ('visiting_team_id', 'visiting_team_goals'),
+    fields = ('tournament', 'match_date', 'round',
+              ('host_team', 'host_team_goals'),
+              ('visiting_team', 'visiting_team_goals'),
               'status')
     # readonly_fields = []
-    # list_display = ['tournament_id', 'match_date']
+    # list_display = ['tournament', 'match_date']
     # list_editable = ['host_team_goals', 'visiting_team_goals']
-    # ordering = ['tournament_id', 'match_date']
+    # ordering = ['tournament', 'match_date']
     list_per_page = 30
-    # search_fields = ['tournament_id']
+    # search_fields = ['tournament']
 
 
 @admin.register(Regions)

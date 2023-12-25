@@ -1,7 +1,7 @@
 <div class="card mb-3">
   <h4 class="card-header">Результати матчів:</h4>
 
-  {% for tournament in tournaments %}
+  {% for tournament in tournaments_name %}
     <div class="card-body">
       <article class="game-feed match-center" id="matchCenterBlock">
           {% if league_title %}<h5 class="card-header">{{ tournament }}</h5>{% endif %}

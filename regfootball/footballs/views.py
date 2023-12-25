@@ -112,136 +112,150 @@ def tournaments_season(request):
 
 
 def tournament(request, region_slug, tournament_slug, season_year):
-    tournaments = Tournaments.objects.get(tournament_slug=tournament_slug)  # визначення турніру
-    tournament_id = tournaments.id
-    table = TournamentTables.objects.get(
-        tournament=tournaments.id,
-        season=season_year
-    ).team.order_by('team').all()  # визначення команд данного турніру
+    tournaments = TournamentTables.objects.values(
+        'tournament__logotype',
+        'tournament__full_name',
+        'team__logotype',
+        'team__team_slug',
+        'team__team',
 
-    matches = Matches.objects.filter(tournament=tournament).order_by('-match_date',
-                                                                           'match_time').all()  # визначення всіх матчів даного турніру
-    tournament_unique = set()
+    ).filter(tournament__tournament_slug=tournament_slug, season=season_year, region__region_slug=region_slug)
+
+    matches = Matches.objects.values(
+        'tournament__name',
+        'round__round',
+        'match_date',
+        'match_time',
+        'host_team__team_slug',
+        'host_team__team',
+        'host_team__id',
+        'host_team__logotype',
+        'id',
+        'host_team_goals',
+        'visiting_team_goals',
+        'visiting_team__id',
+        'visiting_team__logotype',
+        'visiting_team__team_slug',
+        'visiting_team__team',
+        'tournament__id',
+        'status'
+    ).filter(tournament__tournament_slug=tournament_slug).order_by('-match_date', 'match_time')    # визначення всіх матчів даного турніру
+
+    tournaments_name = set()
+    for i in tournaments:
+        tournaments_name.add(i['tournament__full_name'])
+
+    rounds = set()  # Визначає всі тури сесону
     for i in matches:
-        tournament_unique.add(i.tournament)
+        rounds.add(i['round__round'])
 
-    print_table = False  # Признак, чи потрібно виводити турнірну таблицю
+    #
+    # rez_list = list()                   # Словник таблиці результатів
+    # for team in table:                  # кількості зіграних матчів в турнірі певною командою
+    #     team_result = matches.filter(
+    #         Q(tournament_id=tournament)
+    #         & (Q(host_team=team.id) | Q(visiting_team=team.id))
+    #         & Q(match_status__in=('played', 'tech_defeat')))
+    #
+    #     # кількості матчів в турнірі однієї команди (дома - на виїзді)
+    #     match_home = matches.filter(
+    #         Q(tournament_id=tournament) & Q(host_team=team.id) & Q(
+    #             match_status__in=('played', 'tech_defeat'))).all()
+    #     match_guests = matches.filter(
+    #         Q(tournament_id=tournament) & Q(visiting_team=team.id) & Q(
+    #             match_status__in=('played', 'tech_defeat'))).all()
+    #
+    #     # Перемінні для підрахунку перемог-нічиїх-поразок в матчах турніру
+    #     count_v_h, count_n_h, count_p_h = 0, 0, 0
+    #     count_v_g, count_n_g, count_p_g = 0, 0, 0
+    #
+    #     for i in match_home:  # Цикли домашніх матчів
+    #         if i.host_team_goals > i.visiting_team_goals:  # Виграші
+    #             count_v_h = count_v_h + 1
+    #         elif i.host_team_goals == i.visiting_team_goals:  # Нічиї
+    #             count_n_h = count_n_h + 1
+    #         elif i.host_team_goals < i.visiting_team_goals:  # Поразки
+    #             count_p_h = count_p_h + 1
+    #
+    #     for j in match_guests:  # Цикли матчів на виїзді
+    #         if j.host_team_goals < j.visiting_team_goals:  # Виграші
+    #             count_v_g = count_v_g + 1
+    #         elif j.host_team_goals == j.visiting_team_goals:  # Нічиї
+    #             count_n_g = count_n_g + 1
+    #         elif j.host_team_goals > j.visiting_team_goals:  # Поразки
+    #             count_p_g = count_p_g + 1
+    #
+    #     match_victory = count_v_g + count_v_h
+    #     match_nichiya = count_n_g + count_n_h
+    #     match_losing = count_p_g + count_p_h
+    #
+    #     points = (match_victory * 3) + (match_nichiya * 1)  # Розрахунок залікових білів
+    #
+    #     # визначення забитих голів
+    #     goals_home, goals_guests = 0, 0
+    #
+    #     for i in match_home:
+    #         goals_home = goals_home + i.host_team_goals
+    #     for j in match_guests:
+    #         goals_guests = goals_guests + j.visiting_team_goals
+    #
+    #     goals_scored = goals_home + goals_guests
+    #
+    #     # визначення пропущених голів
+    #     goals_home, goals_guests = 0, 0
+    #
+    #     for i in match_home:
+    #         goals_home = goals_home + i.visiting_team_goals
+    #     for j in match_guests:
+    #         goals_guests = goals_guests + j.host_team_goals
+    #
+    #     goals_missed = goals_home + goals_guests
+    #
+    #     # визначення різниці голів
+    #     goals = int(goals_scored) - int(goals_missed)
+    #
+    #     rez_list.append({                   # формування словника турнірної таблиці
+    #         'team_o': points,               # Залікові бали
+    #         'team': team,                   # Назва команди
+    #         'team_i': team_result.count(),  # Кількість зіграних матчів
+    #         'team_v': match_victory,        # Виграші
+    #         'team_n': match_nichiya,        # Нічиї
+    #         'team_p': match_losing,         # Поразки
+    #         'team_zm': goals_scored,        # Забиті голи
+    #         'team_pm': goals_missed,        # Пропущені голи
+    #         'team_rm': goals,               # Різниця (Забиті-пропущені)
+    #     },
+    #     )
 
-    tours_unique = set()  # Визначає всі тури сезону
-    for i in matches:
-        tours_unique.add(i.round)
-        if i.round.id < 7:
-            print_table = True
-        else:
-            print_table = False
-
-    rez_list = list()  # Словник таблиці результатів
-    for team in table:  # кількості зіграних матчів в турнірі певною командою
-        team_result = matches.filter(
-            Q(tournament_id=tournament)
-            & (Q(host_team=team.id) | Q(visiting_team=team.id))
-            & Q(match_status__in=('played', 'tech_defeat')))
-
-        # кількості матчів в турнірі однієї команди (дома - на виїзді)
-        match_home = matches.filter(
-            Q(tournament_id=tournament) & Q(host_team=team.id) & Q(
-                match_status__in=('played', 'tech_defeat'))).all()
-        match_guests = matches.filter(
-            Q(tournament_id=tournament) & Q(visiting_team=team.id) & Q(
-                match_status__in=('played', 'tech_defeat'))).all()
-
-        # Перемінні для підрахунку перемог-нічиїх-поразок в матчах турніру
-        count_v_h, count_n_h, count_p_h = 0, 0, 0
-        count_v_g, count_n_g, count_p_g = 0, 0, 0
-
-        for i in match_home:  # Цикли домашніх матчів
-            if i.host_team_goals > i.visiting_team_goals:  # Виграші
-                count_v_h = count_v_h + 1
-            elif i.host_team_goals == i.visiting_team_goals:  # Нічиї
-                count_n_h = count_n_h + 1
-            elif i.host_team_goals < i.visiting_team_goals:  # Поразки
-                count_p_h = count_p_h + 1
-
-        for j in match_guests:  # Цикли матчів на виїзді
-            if j.host_team_goals < j.visiting_team_goals:  # Виграші
-                count_v_g = count_v_g + 1
-            elif j.host_team_goals == j.visiting_team_goals:  # Нічиї
-                count_n_g = count_n_g + 1
-            elif j.host_team_goals > j.visiting_team_goals:  # Поразки
-                count_p_g = count_p_g + 1
-
-        match_victory = count_v_g + count_v_h
-        match_nichiya = count_n_g + count_n_h
-        match_losing = count_p_g + count_p_h
-
-        points = (match_victory * 3) + (match_nichiya * 1)  # Розрахунок залікових білів
-
-        # визначення забитих голів
-        goals_home, goals_guests = 0, 0
-
-        for i in match_home:
-            goals_home = goals_home + i.host_team_goals
-        for j in match_guests:
-            goals_guests = goals_guests + j.visiting_team_goals
-
-        goals_scored = goals_home + goals_guests
-
-        # визначення пропущених голів
-        goals_home, goals_guests = 0, 0
-
-        for i in match_home:
-            goals_home = goals_home + i.visiting_team_goals
-        for j in match_guests:
-            goals_guests = goals_guests + j.host_team_goals
-
-        goals_missed = goals_home + goals_guests
-
-        # визначення різниці голів
-        goals = int(goals_scored) - int(goals_missed)
-
-        rez_list.append({  # формування словника турнірної таблиці
-            'team_o': points,  # Залікові бали
-            'team': team,  # Назва команди
-            'team_i': team_result.count(),  # Кількість зіграних матчів
-            'team_v': match_victory,  # Виграші
-            'team_n': match_nichiya,  # Нічиї
-            'team_p': match_losing,  # Перемоги
-            'team_zm': goals_scored,  # Забиті голи
-            'team_pm': goals_missed,  # Пропущені голи
-            'team_rm': goals,  # Різниця (Забиті-пропущені)
-        },
-        )
-
-    # формування та сортування команд згідно турнірного становища
-    new_max_list = list()
-    for i in rez_list:
-        new_max_list.append(i['team_o'])
-
-    max_list = sorted(new_max_list)
-    new_rez_list = list()
-
-    while rez_list:
-        for i in rez_list:
-            if int(i['team_o']) == max(max_list):
-                max_list.pop()
-                new_rez_list.append(i)
-                rez_list.remove(i)
+    # # формування та сортування команд згідно турнірного становища
+    # new_max_list = list()
+    # for i in rez_list:
+    #     new_max_list.append(i['team_o'])
+    #
+    # max_list = sorted(new_max_list)
+    # new_rez_list = list()
+    #
+    # while rez_list:
+    #     for i in rez_list:
+    #         if int(i['team_o']) == max(max_list):
+    #             max_list.pop()
+    #             new_rez_list.append(i)
+    #             rez_list.remove(i)
 
     context = {
-        'title': tournaments.name,
-        'tournament': tournaments,
-        'table': table,
-        'tournament_unique': tournament_unique,
-        'standings': new_rez_list,
-        'teams': table,
+        # 'title': tournaments.name,    # Повна назва турніру
+        'tournaments': tournaments,
+        # 'table': table,
+        # 'standings': new_rez_list,
+        # 'teams': table,
         'matches': matches,
-        'tours_unique': tours_unique,
-        'button': False,  # Видимість кнопки "Редагувати матч"
-        'tour_title': True,  # Видимість "Назви туру" в заголовку
-        'tour_match': False,  # Видимість "Назви туру" в матчі
+        'tournaments_name': sorted(tournaments_name),
+        'rounds': sorted(rounds),
+        'button': False,        # Видимість кнопки "Редагувати матч"
+        'tour_title': True,     # Видимість "Назви туру" в заголовку
+        'tour_match': False,    # Видимість "Назви туру" в матчі
         'league_title': False,  # Видимість "Назви турніру"
         'league_match': False,  # Видимість "Назви турніру" в матчі
-        'print_table': print_table
     }
     return render(request, 'footballs/tournament.html', context)
 
@@ -324,9 +338,9 @@ def matches(request):
         'status'
     ).order_by('-match_date', 'match_time')
 
-    tournaments = set()  # Визначає всі турніри сесону
+    tournaments_name = set()  # Визначає всі турніри сесону
     for i in matches:
-        tournaments.add(i['tournament__name'])
+        tournaments_name.add(i['tournament__name'])
 
     rounds = set()  # Визначає всі тури сесону
     for i in matches:
@@ -335,13 +349,13 @@ def matches(request):
     context = {
         'title': "Матчі сезону",
         'matches': matches,
-        'tournaments': sorted(tournaments),
+        'tournaments_name': sorted(tournaments_name),
         'rounds': sorted(rounds),
-        'button': False,  # Видимість кнопки "Редагувати матч"
+        'button': False,       # Видимість кнопки "Редагувати матч"
         'round_title': False,  # Видимість "Назви туру" в заголовку
-        'round_match': True,  # Видимість "Назви туру" в матчі
+        'round_match': True,   # Видимість "Назви туру" в матчі
         'league_title': True,  # Видимість "Назви турніру"
-        'league_match': False,  # Видимість "Назви турніру" в матчі
+        'league_match': False, # Видимість "Назви турніру" в матчі
     }
     return render(request, 'footballs/matches.html', context)
 

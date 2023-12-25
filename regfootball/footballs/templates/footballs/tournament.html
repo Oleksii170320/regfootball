@@ -1,7 +1,7 @@
 {% extends 'base.html'%}
 
 {% block page_header %}
-  <h3><img src="{{ tournament.logotype.url }}" width="100"> {{ tournament.full_name }}</h3>
+  <h3><img src="{{ tournaments.tournament__logotype.url }}" width="100"> {{ tournament }}</h3>
 {% endblock page_header %}
 
 {% block content %} <!-- Блок контент -->
@@ -9,15 +9,15 @@
 
   <div class="card-body" align="center">
 
-    {% for team in teams %}
-      <a href="{% url 'footballs:team' team.team_slug %}">
-        <img height="70" src="{{ team.logotype.url }}"/>
+    {% for team in tournaments %}
+      <a href="{% url 'footballs:team' team.team__team_slug %}">
+        <img height="70" src="{{ team.team__team_slug.url }}"/>
       </a>
     {% endfor %}
 
   </div>          <!-- Блок: Лого команд-учасниць -->
 
-  {% if print_table %}
+
   <div class="card mb-3">
     <h5 class="card-header">Турнірна таблиця</h5>
     <div class="card-body">
@@ -68,9 +68,9 @@
      </div>
     </div>
   </div>                            <!-- Блок: Турнірна таблиця -->
-  {% endif %}
 
-{% include 'footballs/includes/match_list.html' %}  <!-- Блок: Результати/календар матчів -->
+
+{% include 'footballs/includes/match_list_1.html' %}  <!-- Блок: Результати/календар матчів -->
 
 
 

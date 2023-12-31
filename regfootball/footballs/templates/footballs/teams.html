@@ -9,7 +9,10 @@
   <ul>
     {% for team in teams %}
       <li><h5>
-        <a href="{{ team.get_absolute_url }}">{{ team }}</a>
+        <a href="{{ team.get_absolute_url }}">
+          <img src="{{ team.logotype.url }}" width="30">
+          {{ team.team }}
+        </a>
       </h5></li>
     {% empty %}
       <li><h3>Жодної команди не знайдено.</h3></li>

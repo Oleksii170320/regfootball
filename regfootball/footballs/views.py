@@ -1,4 +1,4 @@
-from django.db.models import Q
+from django.db.models import Q, F, Value
 from django.http import Http404
 from django.shortcuts import render, redirect, get_object_or_404
 
@@ -112,42 +112,8 @@ def tournaments_season(request):
 
 
 def tournament(request, region_slug, tournament_slug, season_year):
-    tournaments = TournamentTables.objects.values(
-        'tournament__logotype',
-        'tournament__full_name',
-        'team__logotype',
-        'team__team_slug',
-        'team__team',
 
-    ).filter(tournament__tournament_slug=tournament_slug, season=season_year, region__region_slug=region_slug)
 
-    matches = Matches.objects.values(
-        'tournament__name',
-        'round__round',
-        'match_date',
-        'match_time',
-        'host_team__team_slug',
-        'host_team__team',
-        'host_team__id',
-        'host_team__logotype',
-        'id',
-        'host_team_goals',
-        'visiting_team_goals',
-        'visiting_team__id',
-        'visiting_team__logotype',
-        'visiting_team__team_slug',
-        'visiting_team__team',
-        'tournament__id',
-        'status'
-    ).filter(tournament__tournament_slug=tournament_slug).order_by('-match_date', 'match_time')    # визначення всіх матчів даного турніру
-
-    tournaments_name = set()
-    for i in tournaments:
-        tournaments_name.add(i['tournament__full_name'])
-
-    rounds = set()  # Визначає всі тури сесону
-    for i in matches:
-        rounds.add(i['round__round'])
 
     #
     # rez_list = list()                   # Словник таблиці результатів
@@ -242,20 +208,73 @@ def tournament(request, region_slug, tournament_slug, season_year):
     #             new_rez_list.append(i)
     #             rez_list.remove(i)
 
+
+
+    matches = Matches.objects.values(
+        'id',
+        'tournament__name',
+        'tournament__id',
+        'round__round',
+        'round__id',
+        'match_date',
+        'match_time',
+        'host_team__team',
+        'host_team__team_slug',
+        'host_team__id',
+        'host_team__logotype',
+        'host_team_goals',
+        'visiting_team_goals',
+        'visiting_team__team',
+        'visiting_team__team_slug',
+        'visiting_team__id',
+        'visiting_team__logotype',
+        'status'
+    ).filter(tournament__tournament_slug=tournament_slug).order_by('-match_date', 'match_time')
+
+    tournaments_name = set()  # Визначає всі турніри сесону
+    for i in matches:
+        tournaments_name.add(i['tournament__name'])
+
+    rounds = set()  # Визначає всі тури сесону
+    for i in matches:
+        rounds.add(i['round__round'])
+
+    tournaments = TournamentTables.objects.filter(
+        tournament__tournament_slug=tournament_slug,
+        season=season_year,
+        region__region_slug=region_slug
+    ).annotate(
+        tournament_logo=F('tournament__logotype'),
+        tournament_full_name=F('tournament__full_name'),
+        team_logo=F('team__logotype'),
+        team_slug=F('team__team_slug'),
+        team_name=F('team__team'),
+        count_matches=F('team')*3,
+        count_wins=F('team'),
+        count_draw=F('team')*5,
+        count_defeat=F('team')*6,
+        goals_scored=F('team')*9,
+        goals_conceded=F('team')*8,
+        goals_difference=F('team')*7,
+        points=F('team')*2,
+    )
+
+
     context = {
-        # 'title': tournaments.name,    # Повна назва турніру
+        'title': tournament_slug,    # Повна назва турніру
         'tournaments': tournaments,
         # 'table': table,
         # 'standings': new_rez_list,
         # 'teams': table,
+        # 'team_i': tournaments.count(),
         'matches': matches,
         'tournaments_name': sorted(tournaments_name),
         'rounds': sorted(rounds),
-        'button': False,        # Видимість кнопки "Редагувати матч"
-        'tour_title': True,     # Видимість "Назви туру" в заголовку
-        'tour_match': False,    # Видимість "Назви туру" в матчі
-        'league_title': False,  # Видимість "Назви турніру"
-        'league_match': False,  # Видимість "Назви турніру" в матчі
+        'button': False,           # Видимість кнопки "Редагувати матч"
+        'round_title': False,      # Видимість "Назви туру" в заголовку
+        'round_match': True,       # Видимість "Назви туру" в матчі
+        'league_title': True,      # Видимість "Назви турніру"
+        'league_match': False,     # Видимість "Назви турніру" в матчі
     }
     return render(request, 'footballs/tournament.html', context)
 

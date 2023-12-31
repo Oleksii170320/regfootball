@@ -6,21 +6,24 @@
       <article class="game-feed match-center" id="matchCenterBlock">
           {% if league_title %}<h5 class="card-header">{{ tournament }}</h5>{% endif %}
 
+
           {% for round in rounds %}
-            {% if round_title %}<h6 class="card-header">{{ round }}</h6>{% endif %}<!-- Розподіл на тури -->
+            {% if round_title %}<h6 class="card-header">{{ round }}</h6>{% endif %}              <!-- Розподіл на тури -->
+
 
               <table class="table table-striped table-hover">
-                {% for match in matches %}         <!-- Розполіл на матчі в турах -->
-                  {% if tournament == match.tournament__name and round == match.round__round %}    <!-- Фільтр по турнірах  -->
+                {% for match in matches %}                                                       <!-- Розполіл на матчі в турах -->
+                  {% if tournament == match.tournament__name and round == match.round__round %}  <!-- Фільтр по турнірах  -->
                     <tr id="match_id {{ match.id }}">
 
-                      {% if league_match %}
+
+                      {% if league_match %}                                                       <!-- Вивід назви турніру в заголовку -->
                           <td class="legue" width="100">
                             <strong>{{ match.tournament__name }}</strong>
                           </td>
                       {% endif %}
 
-                      {% if round_match %}
+                      {% if round_match %}                                                        <!-- Вивід раунду в заголовку -->
                           <td class="round" width="60">
                             <strong>{{ match.round__round }}</strong>
                           </td>

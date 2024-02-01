@@ -5,7 +5,7 @@ from .models import *
 
 class TeamsForm(forms.ModelForm):
     class Meta:
-        model = TournamentTables
+        model = Standings
         fields = [
             'region',
         ]
@@ -36,8 +36,8 @@ class MatchesForm(forms.ModelForm):
             'match_time',
             'tournament',
             'host_team',
-            'host_team_goals',
+            'host_goals',
             'visiting_team',
-            'visiting_team_goals',
+            'visiting_goals',
             'status',
         ]

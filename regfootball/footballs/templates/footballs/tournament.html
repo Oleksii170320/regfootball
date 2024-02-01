@@ -1,24 +1,31 @@
 {% extends 'base.html'%}
 
+ <!-- Блок: Заголовок турніру -->
 {% block page_header %}
-  <h3><img src="{{ tournaments.tournament__logotype.url }}" width="100"> {{ tournament }}</h3>
+  <h3>
+    {% for tournament in tournaments %}
+      {% if forloop.first %}
+        <img src="/media/{{ tournament.tournament__logotype }}" width="100" alt="logo">
+        {{ tournament.tournament__full_name }} {{ tournament.season }}
+      {% endif %}
+    {% endfor %}
+  </h3>
 {% endblock page_header %}
 
 {% block content %} <!-- Блок контент -->
 
-
+  <!-- Блок: Лого команд-учасниць турніру -->
   <div class="card-body" align="center">
 
     {% for team in tournaments %}
-      <a href="{% url 'footballs:team' team.team_slug %}">
-        <img height="70" src="{{ team.team_slug.url }}"/>
-        <h5>{{ team.team_name }}</h5>
+      <a href="{% url 'footballs:team' team.team__team_slug %}">
+        <img src="/media/{{ team.team__logotype }}" width="100" alt="{{ team.team__team }}">
       </a>
     {% endfor %}
 
-  </div>          <!-- Блок: Лого команд-учасниць -->
+  </div>
 
-
+  <!-- Блок: Турнірна таблиця -->
   <div class="card mb-3">
     <h5 class="card-header">Турнірна таблиця</h5>
     <div class="card-body">
@@ -39,19 +46,21 @@
             </tr>
           </thead>
 
-          {% for tournament in tournaments %}
+          {% for tournament in tournaments|dictsortreversed:"points" %}
             <tr>
               <td class="data-rank">                                                   <!-- Нумерація рядків таблиці -->
                 {{ forloop.counter }}
               </td>
+
               <td class="data-logo">                                                   <!-- Лого команди -->
-                <a href="{% url 'footballs:team' tournament.team_slug %}">
-                  <img height="40" src="{{ tournament.team_logo.url }}"/>
+                <a href="{% url 'footballs:team' tournament.team__team_slug %}">
+                  <img src="/media/{{ tournament.team__logotype}}" height="40" alt="logo">
                 </a>
               </td>
+
               <td class="data-name" >                                                  <!-- Назва команди -->
-                  <a href="{% url 'footballs:team' tournament.team_slug %}">
-                    <strong>{{ tournament.team_name }}</strong>
+                  <a href="{% url 'footballs:team' tournament.team__team_slug %}">
+                    <strong>{{ tournament.team__name }}</strong>
                   </a>
               </td>
               <td class="data-p">{{ tournament.count_matches }}</td>                   <!-- Кількість зіграних матчів -->
@@ -66,10 +75,10 @@
         </table>
      </div>
     </div>
-  </div>                            <!-- Блок: Турнірна таблиця -->
+  </div>
 
-
-{% include 'footballs/includes/match_list_1.html' %}  <!-- Блок: Результати/календар матчів -->
+  <!-- Блок: Результати/календар матчів турніру -->
+  {% include 'footballs/includes/match_list.html' %}
 
 
 

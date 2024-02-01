@@ -6,9 +6,9 @@ from .models import *
 
 @admin.register(Teams)
 class TeamsAdmin(admin.ModelAdmin):
-    fields = ['team',
+    fields = ['name',
               'team_slug',
-              'team_full_name',
+              'full_name',
               'region',
               'town',
               'address',
@@ -18,7 +18,7 @@ class TeamsAdmin(admin.ModelAdmin):
               'born',
               'stadium',
               ]
-    prepopulated_fields = {"team_slug": ('team', )}
+    prepopulated_fields = {"team_slug": ('name', )}
     list_per_page = 10
     save_on_top = True
 
@@ -32,7 +32,7 @@ class TournamentsAdmin(admin.ModelAdmin):
     list_per_page = 20
 
 
-@admin.register(TournamentTables)
+@admin.register(Standings)
 class TournamentTablesAdmin(admin.ModelAdmin):
     fields = ['region', 'tournament', 'season', 'team', ]
     list_per_page = 10
@@ -42,12 +42,12 @@ class TournamentTablesAdmin(admin.ModelAdmin):
 @admin.register(Matches)
 class MatchesAdmin(admin.ModelAdmin):
     fields = ('tournament', 'match_date', 'round',
-              ('host_team', 'host_team_goals'),
-              ('visiting_team', 'visiting_team_goals'),
+              ('host_team', 'host_goals'),
+              ('visiting_team', 'visiting_goals'),
               'status')
     # readonly_fields = []
     # list_display = ['tournament', 'match_date']
-    # list_editable = ['host_team_goals', 'visiting_team_goals']
+    # list_editable = ['host_goals', 'visiting_goals']
     # ordering = ['tournament', 'match_date']
     list_per_page = 30
     # search_fields = ['tournament']

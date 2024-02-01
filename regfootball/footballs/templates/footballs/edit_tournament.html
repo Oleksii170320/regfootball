@@ -7,7 +7,7 @@
 
 
 {% block content %}
-  <h6><a href="{% url 'footballs:tournament' tournament.tournament_slug %}">{{ name }}</a></h6>
+  <h6><a href="{% url 'footballs:tournament_info' tournament.tournament_slug %}">{{ name }}</a></h6>
 
     <form action="{% url 'footballs:edit_tournament' tournament.tournament_slug %}" enctype="multipart/form-data" method='post' form method="post">
         {% csrf_token %}

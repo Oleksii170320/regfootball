@@ -1,13 +1,13 @@
 {% extends 'base.html'%}
 
 {% block page_header %}
-  <h1><img src="{{ team.logotype.url }}" width="100"> {{ team }}</h1>
+  <h1><img src="{{ team.logotype.url }}" width="100" alt="img_logo"> {{ name }}</h1>
 {% endblock page_header %}
 
 {% block content %}
 
   <div class="card mb-3">
-     <h4 class="card-header">{{ team.team_full_name }}</h4>
+     <h4 class="card-header">{{ team.full_name }}</h4>
      <div class="card-body">
         <lu>
          <li>{{ team.region }} область
@@ -23,11 +23,11 @@
       </div>
   </div>
 
-  <p><button name="submit">
-    <a href="{% url 'footballs:edit_team' team.team_slug %}">Редагувати</a>
-  </button></p>
+<!--  <p><button name="submit">-->
+<!--    <a href="{% url 'footballs:edit_team' team.team_slug %}">Редагувати</a>-->
+<!--  </button></p>-->
 
-{% include 'footballs/includes/match_list.html' %}
+  {% include 'footballs/includes/match_list.html' %}
 
 {% endblock content %}
 

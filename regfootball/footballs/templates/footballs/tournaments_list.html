@@ -8,9 +8,9 @@
   <ul>
     {% for tournament in tournaments %}
       <li><h5>
-        <a href="{{ tournament_info.get_absolute_url }}">
+        <a href="{% url 'footballs:tournament_info' tournament.tournament_slug %}">
           <img src="{{ tournament.logotype.url }}" width="30">
-          {{ tournament.name }} </a>
+          {{ tournament.full_name }} </a>
       </h5></li>
     {% empty %}
       <li><h5>Жодного турніру не знайдено.</h5></li>

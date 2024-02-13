@@ -27,46 +27,46 @@
                       {% endif %}
 
                         <td class="day-date" width="120">
-                          {{ match.match_date|date:'l - d.m.y' }}
+                          {{ match.match_event|date:'l - d.m.y' }}
                         </td>
 
                         <td class="time" width="30">
-                          {{ match.match_time|time:"G:i" }}
+                          {{ match.match_event|time:"G:i" }}
                         </td>
 
                         <td class="left-team" width="160" align="right">
-                          <a href="{% url 'footballs:team' match.host_team__team_slug %}">
-                            {{ match.host_team__name }}
+                          <a href="{% url 'footballs:team' match.team1__team_slug %}">
+                            {{ match.team1__name }}
                           </a>
                         </td>
 
                         <td class="left-logo" width="40" align="center">
-                          <a href="{% url 'footballs:team' match.host_team__team_slug %}">
-                            <img src="/media/{{ match.host_team__logotype }}" height="30">
+                          <a href="{% url 'footballs:team' match.team1__team_slug %}">
+                            <img src="/media/{{ match.team1__logotype }}" height="30">
                           </a>
                         </td>
 
 		                <td class="score" width="60" align="center" >
                           <div class="score-holder">
                             <a href="{% url 'footballs:match' match.id %}">
-                              {% if match.host_goals == None %}
+                              {% if match.goals_team1 == None %}
                                 <strong>- : -</strong>
                               {% else %}
-                                <strong>{{ match.host_goals }}:{{ match.visiting_goals }}</strong>
+                                <strong>{{ match.goals_team1 }}:{{ match.goals_team2 }}</strong>
                               {% endif %}
                             </a>
                           </div>
                         </td>
 
                         <td class="left-logo" width="40"  align="center">
-                          <a href="{% url 'footballs:team' match.visiting_team__team_slug %}">
-                            <img src="/media/{{ match.visiting_team__logotype }}" height="30">
+                          <a href="{% url 'footballs:team' match.team2__team_slug %}">
+                            <img src="/media/{{ match.team2__logotype }}" height="30">
                           </a>
                         </td>
 
                         <td class="right-team" width="160">
-                          <a href="{% url 'footballs:team' match.visiting_team__team_slug %}">
-                            {{ match.visiting_team__name }}
+                          <a href="{% url 'footballs:team' match.team2__team_slug %}">
+                            {{ match.team2__name }}
                           </a>
                         </td>
 

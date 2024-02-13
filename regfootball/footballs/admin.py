@@ -41,14 +41,14 @@ class TournamentTablesAdmin(admin.ModelAdmin):
 
 @admin.register(Matches)
 class MatchesAdmin(admin.ModelAdmin):
-    fields = ('tournament', 'match_date', 'round',
-              ('host_team', 'host_goals'),
-              ('visiting_team', 'visiting_goals'),
+    fields = ('tournament', 'match_event', 'round',
+              ('team1', 'goals_team1'),
+              ('team2', 'goals_team2'),
               'status')
     # readonly_fields = []
-    # list_display = ['tournament', 'match_date']
-    # list_editable = ['host_goals', 'visiting_goals']
-    # ordering = ['tournament', 'match_date']
+    # list_display = ['tournament', 'match_event']
+    # list_editable = ['goals_team1', 'goals_team2']
+    # ordering = ['tournament', 'match_event']
     list_per_page = 30
     # search_fields = ['tournament']
 

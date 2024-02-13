@@ -39,26 +39,25 @@ def team(request, team_slug):
         'tournament__tournament__id',
         'round__round',
         'round__id',
-        'match_date',
-        'match_time',
-        'host_team__name',
-        'host_team__team_slug',
-        'host_team__id',
-        'host_team__logotype',
-        'host_goals',
-        'visiting_goals',
-        'visiting_team__name',
-        'visiting_team__team_slug',
-        'visiting_team__id',
-        'visiting_team__logotype',
+        'match_event',
+        'team1__name',
+        'team1__team_slug',
+        'team1__id',
+        'team1__logotype',
+        'goals_team1',
+        'goals_team2',
+        'team2__name',
+        'team2__team_slug',
+        'team2__id',
+        'team2__logotype',
         'status'
-    ).filter(Q(host_team__team_slug=team_slug) | Q(visiting_team__team_slug=team_slug)).order_by('-match_date', 'match_time')
+    ).filter(Q(team1__team_slug=team_slug) | Q(team2__team_slug=team_slug)).order_by('-match_event')
 
-    tournaments_name = set()   # Визначає всі унікальні назви турніри
+    tournaments_name = set()  # Визначає всі унікальні назви турніри
     for i in matches:
         tournaments_name.add(i['tournament__tournament__name'])
 
-    rounds = set()             # Визначає всі унікальні тури турніру
+    rounds = set()  # Визначає всі унікальні тури турніру
     for i in matches:
         rounds.add(i['round__round'])
 
@@ -68,12 +67,12 @@ def team(request, team_slug):
         'matches': matches,
         # Параметри, для побудови в шаблоні інформації "календар матчів":
         'tournaments_name': sorted(tournaments_name),  # сортування турнірів в порядку статусу;
-        'rounds': sorted(rounds),                      # сортування раундів турніру в порядку зростання;
-        'button': False,                               # Параметр, що відтворює кнопку "Редагувати матч" в кожному записі матчів;
-        'round_title': False,                          # Параметр, що відтворює "Назви туру" над записами всіх матчів даного туру;
-        'round_match': True,                           # Параметр, що відтворює "Назви туру" в кожному записі матчів;
-        'league_title': False,                          # Параметр, що відтворює "Назву турніру" над всіма матчами даного турніру;
-        'league_match': True,                         # Параметр, що вказує видимість "Назви турніру" в кожному записі матчів.
+        'rounds': sorted(rounds),  # сортування раундів турніру в порядку зростання;
+        'button': False,  # Параметр, що відтворює кнопку "Редагувати матч" в кожному записі матчів;
+        'round_title': False,  # Параметр, що відтворює "Назви туру" над записами всіх матчів даного туру;
+        'round_match': True,  # Параметр, що відтворює "Назви туру" в кожному записі матчів;
+        'league_title': False,  # Параметр, що відтворює "Назву турніру" над всіма матчами даного турніру;
+        'league_match': True,  # Параметр, що вказує видимість "Назви турніру" в кожному записі матчів.
     }
     return render(request, 'footballs/team.html', context)
 
@@ -143,28 +142,27 @@ def tournament(request, region_slug, tournament_slug, season_year):
         'tournament__tournament__id',
         'round__round',
         'round__id',
-        'match_date',
-        'match_time',
-        'host_team__name',
-        'host_team__team_slug',
-        'host_team__id',
-        'host_team__logotype',
-        'host_goals',
-        'visiting_goals',
-        'visiting_team__name',
-        'visiting_team__team_slug',
-        'visiting_team__id',
-        'visiting_team__logotype',
+        'match_event',
+        'team1__name',
+        'team1__team_slug',
+        'team1__id',
+        'team1__logotype',
+        'goals_team1',
+        'goals_team2',
+        'team2__name',
+        'team2__team_slug',
+        'team2__id',
+        'team2__logotype',
         'status'
-    ).filter(tournament__tournament__tournament_slug=tournament_slug).order_by('-match_date', 'match_time')
-
-    tournaments_name = set()      # Визначає всі унікальні назви турніри
+    ).filter(tournament__tournament__tournament_slug=tournament_slug).order_by('-match_event')
+    t = 1
+    tournaments_name = set()  # Визначає всі унікальні назви турніри
     tournaments_title = ''
     for i in matches:
         tournaments_name.add(i['tournament__tournament__name'])
         tournaments_title = i['tournament__tournament__name']
 
-    rounds = set()                # Визначає всі унікальні тури турніру
+    rounds = set()  # Визначає всі унікальні тури турніру
     for i in matches:
         rounds.add(i['round__round'])
 
@@ -174,62 +172,12 @@ def tournament(request, region_slug, tournament_slug, season_year):
         season=season_year,
         region__region_slug=region_slug
     ).values(
-        'tournament__logotype',          # лого турніру
-        'tournament__full_name',         # повна назва турніру
-        'season',                        # рік проведення турніру
-        'team__logotype',                # лого команди-учасниці
-        'team__team_slug',               # slug команди-учасниці
-        'team__name',                    # коротка назва команди-учасниці
+        'tournament__logotype',
+        'tournament__full_name',
+        'team__logotype',
+        'team__team_slug',
+        'team__name',
         'team'
-    # ).annotate(
-    #     count_wins=Value(                # кількість перемог в даному турнірі
-    #         matches.filter(
-    #             Q(status__in=('played', 'tech_defeat'))
-    #             & ((Q(host_goals__gt=F('visiting_goals')) & Q(host_team=F('tournament__team')))
-    #             | (Q(host_goals__lt=F('visiting_goals')) & Q(visiting_team=F('tournament__team'))))
-    #         ).count()
-    #     ),
-    #
-    #     count_draw=Value(                # кількість нічийних матчів в даному турнірі
-    #     matches.filter(
-    #             Q(status__in=('played', 'tech_defeat'))
-    #             & ((Q(host_goals=F('visiting_goals')) & Q(host_team=F('tournament__team')))
-    #             | (Q(host_goals=F('visiting_goals')) & Q(visiting_team=F('tournament__team'))))
-    #         ).count()
-    #     ),
-    #
-    #     count_defeat=Value(          # кількість позарок в даному турнірі
-    #         matches.filter(
-    #             Q(status__in=('played', 'tech_defeat'))
-    #             & ((Q(host_goals__lt=F('visiting_goals')) & Q(host_team=F('tournament__team')))
-    #             | (Q(host_goals__gt=F('visiting_goals')) & Q(visiting_team=F('tournament__team'))))
-    #         ).count()
-    #     ),
-    #     count_matches=F('count_wins') + F('count_draw') + F('count_defeat'), # кількість зіграних матчів в даному турнірі
-    #     goals_scored=Value(                                                  # кількість забитих голів в даному турнірі
-    #         matches.filter(
-    #             Q(status__in=('played', 'tech_defeat'))
-    #             & Q(host_team=F('tournament__team'))
-    #         ).aggregate(s=Sum('host_goals')).get('s')
-    #     ) + Value(
-    #         matches.filter(
-    #             Q(status__in=('played', 'tech_defeat'))
-    #             & Q(visiting_team=F('tournament__team'))
-    #         ).aggregate(s=Sum('visiting_goals')).get('s')
-    #     ),
-    #     goals_conceded=Value(         # кількість пропущених голів в даному турнірі
-    #         matches.filter(
-    #             Q(status__in=('played', 'tech_defeat'))
-    #             & Q(host_team=F('tournament__team'))
-    #         ).aggregate(s=Sum('visiting_goals')).get('s')
-    #     ) + Value(
-    #         matches.filter(
-    #             Q(status__in=('played', 'tech_defeat'))
-    #             & Q(visiting_team=F('tournament__team'))
-    #         ).aggregate(s=Sum('host_goals')).get('s')
-    #     ),
-    #     goals_difference=F('goals_scored') - F('goals_conceded'),  # різниця голів в даному турнірі
-    #     points=F('count_wins') * 3 + F('count_draw') * 1,          # залікові бали в даному турнірі
     )
 
     standings = []
@@ -241,8 +189,8 @@ def tournament(request, region_slug, tournament_slug, season_year):
         & Q(season=season_year)
         & Q(region__region_slug=region_slug)
         & Q(matches__status__in=('played', 'tech_defeat'))
-        & ((Q(matches__host_goals__gt=F('matches__visiting_goals')) & Q(matches__host_team=F('team')))
-        | (Q(matches__host_goals__lt=F('matches__visiting_goals')) & Q(matches__visiting_team=F('team')))
+        & ((Q(matches__goals_team1__gt=F('matches__goals_team2')) & Q(matches__team1=F('team')))
+        | (Q(matches__goals_team1__lt=F('matches__goals_team2')) & Q(matches__team2=F('team')))
     )).values('team').annotate(count_wins=Count('id'))
 
     draws = Standings.objects.filter(
@@ -250,55 +198,55 @@ def tournament(request, region_slug, tournament_slug, season_year):
         & Q(season=season_year)
         & Q(region__region_slug=region_slug)
         & Q(matches__status__in=('played', 'tech_defeat'))
-        & ((Q(matches__host_goals=F('matches__visiting_goals')) & Q(matches__host_team=F('team')))
-        | (Q(matches__host_goals=F('matches__visiting_goals')) & Q(matches__visiting_team=F('team')))
-    )).values('team').annotate(count_draw=Count('id'))
+        & ((Q(matches__goals_team1=F('matches__goals_team2')) & Q(matches__team1=F('team')))
+        | (Q(matches__goals_team1=F('matches__goals_team2')) & Q(matches__team2=F('team')))
+    )).values('team').annotate(count_draws=Count('id'))
 
     defeats = Standings.objects.filter(
         Q(tournament__tournament_slug=tournament_slug)
         & Q(season=season_year)
         & Q(region__region_slug=region_slug)
         & Q(matches__status__in=('played', 'tech_defeat'))
-        & ((Q(matches__host_goals__lt=F('matches__visiting_goals')) & Q(matches__host_team=F('team')))
-        | (Q(matches__host_goals__gt=F('matches__visiting_goals')) & Q(matches__visiting_team=F('team')))
-    )).values('team').annotate(count_draw=Count('id'))
+        & ((Q(matches__goals_team1__lt=F('matches__goals_team2')) & Q(matches__team1=F('team')))
+        | (Q(matches__goals_team1__gt=F('matches__goals_team2')) & Q(matches__team2=F('team')))
+    )).values('team').annotate(count_defeats=Count('id'))
 
     home_scored_goals = Standings.objects.filter(
         Q(tournament__tournament_slug=tournament_slug)
         & Q(season=season_year)
         & Q(region__region_slug=region_slug)
         & Q(matches__status__in=('played', 'tech_defeat'))
-        & Q(matches__host_team=F('team'))
-    ).values('team').annotate(host_goals=Sum('matches__host_goals'))
+        & Q(matches__team1=F('team'))
+    ).values('team').annotate(host_goals=Sum('matches__goals_team1'), visiting_goals=Sum('matches__goals_team1'))
 
     visit_scored_goals = Standings.objects.filter(
         Q(tournament__tournament_slug=tournament_slug)
         & Q(season=season_year)
         & Q(region__region_slug=region_slug)
         & Q(matches__status__in=('played', 'tech_defeat'))
-        & Q(matches__visiting_team=F('team'))
-    ).values('team').annotate(visiting_goals=Sum('matches__visiting_goals'))
+        & Q(matches__team2=F('team'))
+    ).values('team').annotate(visiting_goals=Sum('matches__goals_team2'))
 
     home_conceded_goals = Standings.objects.filter(
         Q(tournament__tournament_slug=tournament_slug)
         & Q(season=season_year)
         & Q(region__region_slug=region_slug)
         & Q(matches__status__in=('played', 'tech_defeat'))
-        & Q(matches__visiting_team=F('team'))
-    ).values('team').annotate(host_goals=Sum('matches__host_goals'))
+        & Q(matches__team2=F('team'))
+    ).values('team').annotate(host_goals=Sum('matches__goals_team1'))
 
     visit_conceded_goals = Standings.objects.filter(
         Q(tournament__tournament_slug=tournament_slug)
         & Q(season=season_year)
         & Q(region__region_slug=region_slug)
         & Q(matches__status__in=('played', 'tech_defeat'))
-        & Q(matches__host_team=F('team'))
-    ).values('team').annotate(visiting_goals=Sum('matches__visiting_goals'))
+        & Q(matches__team1=F('team'))
+    ).values('team').annotate(visiting_goals=Sum('matches__goals_team2'))
 
     for team in standings:
         team['count_wins'] = 0
-        team['count_draw'] = 0
-        team['count_defeat'] = 0
+        team['count_draws'] = 0
+        team['count_defeats'] = 0
         team['count_matches'] = 0
         team['points'] = 0
         team['goals_scored_host'] = 0
@@ -315,15 +263,15 @@ def tournament(request, region_slug, tournament_slug, season_year):
                     team['count_wins'] = win['count_wins']
         for draw in draws:
             if team['team'] == draw['team']:
-                if draw['count_draw']:
-                    team['count_draw'] = draw['count_draw']
+                if draw['count_draws']:
+                    team['count_draws'] = draw['count_draws']
         for defeat in defeats:
             if team['team'] == defeat['team']:
-                if defeat['count_draw']:
-                    team['count_defeat'] = defeat['count_draw']
+                if defeat['count_defeats']:
+                    team['count_defeats'] = defeat['count_defeats']
 
-        team['count_matches'] = team['count_wins'] + team['count_draw'] + team['count_defeat']
-        team['points'] = team['count_wins'] * 3 + team['count_draw'] * 1
+        team['count_matches'] = team['count_wins'] + team['count_draws'] + team['count_defeats']
+        team['points'] = team['count_wins'] * 3 + team['count_draws'] * 1
 
         for scored_goal in home_scored_goals:
             if team['team'] == scored_goal['team']:
@@ -348,25 +296,54 @@ def tournament(request, region_slug, tournament_slug, season_year):
         team['goals_conceded'] = team['goals_conceded_host'] + team['goals_conceded_visit']
         team['goals_difference'] = team['goals_scored'] - team['goals_conceded']
 
+
     context = {
-        'title': tournaments_title,                    # назва турніру для закладки браузера
-        'tournaments': standings,                    # Дані для формування турнірної таблиці
-        'matches': matches,                            # Дані для формування календаря матчів
+        'title': tournaments_title,  # назва турніру для закладки браузера
+        'tournaments': standings,  # Дані для формування турнірної таблиці
+        'matches': matches,  # Дані для формування календаря матчів
 
         # Параметри, для побудови в шаблоні інформації "календар матчів":
         'tournaments_name': sorted(tournaments_name),  # сортування турнірів в порядку статусу;
-        'rounds': sorted(rounds),                      # сортування раундів турніру в порядку зростання;
-        'button': False,                               # Параметр, що відтворює кнопку "Редагувати матч" в кожному записі матчів;
-        'round_title': True,                           # Параметр, що відтворює "Назви туру" над записами всіх матчів даного туру;
-        'round_match': False,                          # Параметр, що відтворює "Назви туру" в кожному записі матчів;
-        'league_title': False,                         # Параметр, що відтворює "Назву турніру" над всіма матчами даного турніру;
-        'league_match': False,                         # Параметр, що вказує видимість "Назви турніру" в кожному записі матчів.
+        'rounds': sorted(rounds),  # сортування раундів турніру в порядку зростання;
+        'button': False,  # Параметр, що відтворює кнопку "Редагувати матч" в кожному записі матчів;
+        'round_title': True,  # Параметр, що відтворює "Назви туру" над записами всіх матчів даного туру;
+        'round_match': False,  # Параметр, що відтворює "Назви туру" в кожному записі матчів;
+        'league_title': False,  # Параметр, що відтворює "Назву турніру" над всіма матчами даного турніру;
+        'league_match': False,  # Параметр, що вказує видимість "Назви турніру" в кожному записі матчів.
     }
     return render(request, 'footballs/tournament.html', context)
 
 
+def tournament1(request):
+    standings = Teams.objects.raw('''
+        SELECT  q.*, 
+                scored-concealed AS difference, 
+                3*wins+draws AS points 
+        FROM (
+            SELECT 
+                t.id AS id, 
+                t.name AS team,
+                t.logotype AS logo,
+                t.team_slug AS slug, 
+                COUNT(m.id) AS played,
+                SUM(CASE WHEN (t.id = m.team1_id AND m.goals_team1 > m.goals_team2) 
+                           OR (t.id = m.team2_id AND m.goals_team1 < m.goals_team2) THEN 1 ELSE 0 END) AS wins,
+                SUM(CASE WHEN m.goals_team1 = m.goals_team2 THEN 1 ELSE 0 END) AS draws,
+                SUM(CASE WHEN (t.id = m.team1_id AND m.goals_team1 < m.goals_team2) 
+                           OR (t.id = m.team2_id AND m.goals_team1 > m.goals_team2) THEN 1 ELSE 0 END) AS loses,
+                SUM(CASE WHEN t.id = m.team1_id THEN m.goals_team1 ELSE goals_team2 END) AS scored,
+                SUM(CASE WHEN t.id = m.team2_id THEN m.goals_team1 ELSE goals_team2 END) AS concealed
+            FROM footballs_teams t
+            JOIN main.footballs_matches m ON t.id = m.team1_id OR t.id = m.team2_id
+            WHERE m.tournament_id=1 AND m.status IN ('played')
+            GROUP BY t.id
+        ) q
+    ''')
+    return render(request, 'footballs/tournament1.html', {'data': standings})
+
+
 def tournaments_list(request):
-    tournaments_list = Tournaments.objects.order_by('date_create')
+    tournaments_list = Tournaments.objects.all()
 
     context = {
         'title': "Турніри",
@@ -430,25 +407,24 @@ def matches(request):
         'tournament__tournament__id',
         'round__round',
         'round__id',
-        'match_date',
-        'match_time',
-        'host_team__name',
-        'host_team__team_slug',
-        'host_team__id',
-        'host_team__logotype',
-        'host_goals',
-        'visiting_goals',
-        'visiting_team__name',
-        'visiting_team__team_slug',
-        'visiting_team__id',
-        'visiting_team__logotype',
+        'match_event',
+        'team1__name',
+        'team1__team_slug',
+        'team1__id',
+        'team1__logotype',
+        'goals_team1',
+        'goals_team2',
+        'team2__name',
+        'team2__team_slug',
+        'team2__id',
+        'team2__logotype',
         'status'
-    ).order_by('-match_date', 'match_time')
-    tournaments_name = set()   # Визначає всі унікальні назви турніри
+    ).order_by('-match_event')
+    tournaments_name = set()  # Визначає всі унікальні назви турніри
     for i in matches:
         tournaments_name.add(i['tournament__tournament__name'])
 
-    rounds = set()             # Визначає всі унікальні тури турніру
+    rounds = set()  # Визначає всі унікальні тури турніру
     for i in matches:
         rounds.add(i['round__round'])
 
@@ -457,12 +433,12 @@ def matches(request):
         'matches': matches,
         # Параметри, для побудови в шаблоні інформації "календар матчів":
         'tournaments_name': sorted(tournaments_name),  # сортування турнірів в порядку статусу;
-        'rounds': sorted(rounds),                      # сортування раундів турніру в порядку зростання;
-        'button': False,                               # Параметр, що відтворює кнопку "Редагувати матч" в кожному записі матчів;
-        'round_title': False,                          # Параметр, що відтворює "Назви туру" над записами всіх матчів даного туру;
-        'round_match': True,                           # Параметр, що відтворює "Назви туру" в кожному записі матчів;
-        'league_title': True,                          # Параметр, що відтворює "Назву турніру" над всіма матчами даного турніру;
-        'league_match': False,                         # Параметр, що вказує видимість "Назви турніру" в кожному записі матчів.
+        'rounds': sorted(rounds),  # сортування раундів турніру в порядку зростання;
+        'button': False,  # Параметр, що відтворює кнопку "Редагувати матч" в кожному записі матчів;
+        'round_title': False,  # Параметр, що відтворює "Назви туру" над записами всіх матчів даного туру;
+        'round_match': True,  # Параметр, що відтворює "Назви туру" в кожному записі матчів;
+        'league_title': True,  # Параметр, що відтворює "Назву турніру" над всіма матчами даного турніру;
+        'league_match': False,  # Параметр, що вказує видимість "Назви турніру" в кожному записі матчів.
     }
     return render(request, 'footballs/matches.html', context)
 
@@ -470,14 +446,14 @@ def matches(request):
 def matches_test(request):
     """Інформація для сторінки 'всі матчі сезону' """
     matches = Matches.objects.select_related('tournament',
-                                             'host_team',
-                                             'visiting_team',
+                                             'team1',
+                                             'team2',
                                              'tournament__region',
                                              'round',
                                              'tournament__tournament'
-    ).order_by('-match_date', 'match_time')
+                                             ).order_by('-match_event')
 
-    tournaments_name = set()   # Визначає всі унікальні назви турніри
+    tournaments_name = set()  # Визначає всі унікальні назви турніри
     for i in matches:
         tournaments_name.add(i.tournament.tournament.name)
 
@@ -490,14 +466,27 @@ def matches_test(request):
         'matches': matches,
         # Параметри, для побудови в шаблоні інформації "календар матчів":
         'tournaments_name': sorted(tournaments_name),  # сортування турнірів в порядку статусу;
-        'rounds': sorted(rounds),                      # сортування раундів турніру в порядку зростання;
-        'button': False,                               # Параметр, що відтворює кнопку "Редагувати матч" в кожному записі матчів;
-        'round_title': False,                          # Параметр, що відтворює "Назви туру" над записами всіх матчів даного туру;
-        'round_match': True,                           # Параметр, що відтворює "Назви туру" в кожному записі матчів;
-        'league_title': True,                          # Параметр, що відтворює "Назву турніру" над всіма матчами даного турніру;
-        'league_match': False,                         # Параметр, що вказує видимість "Назви турніру" в кожному записі матчів.
+        'rounds': sorted(rounds),  # сортування раундів турніру в порядку зростання;
+        'button': False,  # Параметр, що відтворює кнопку "Редагувати матч" в кожному записі матчів;
+        'round_title': False,  # Параметр, що відтворює "Назви туру" над записами всіх матчів даного туру;
+        'round_match': True,  # Параметр, що відтворює "Назви туру" в кожному записі матчів;
+        'league_title': True,  # Параметр, що відтворює "Назву турніру" над всіма матчами даного турніру;
+        'league_match': False,  # Параметр, що вказує видимість "Назви турніру" в кожному записі матчів.
     }
     return render(request, 'footballs/matches_test.html', context)
+
+
+def matches_test1(request):
+    matches = Matches.objects.raw("""
+            SELECT m.id AS id, t.name AS teamm
+            FROM footballs_matches AS m
+            INNER JOIN footballs_teams AS t ON m.team1_id = t.id
+            WHERE m.tournament_id = 1 AND m.status in ('played', 'tech_defeat')
+    """)
+
+    print(matches)
+
+    return render(request, 'footballs/matches_test1.html', {'data': matches})
 
 
 def match(request, match_id):

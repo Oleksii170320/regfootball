@@ -19,7 +19,7 @@
 
     {% for team in tournaments %}
       <a href="{% url 'footballs:team' team.team__team_slug %}">
-        <img src="/media/{{ team.team__logotype }}" width="100" alt="{{ team.team__name }}">
+        <img src="/media/{{ team.team__logotype }}" width="100" alt="{{ team.team__team }}">
       </a>
     {% endfor %}
 

@@ -28,7 +28,7 @@ class Rounds(models.Model):
 class Regions(models.Model):
     name = models.CharField(max_length=100, blank=True, verbose_name="Область", unique=True)
     region_slug = models.SlugField(max_length=70, unique=True, db_index=True, verbose_name="Slug")
-    date_create = models.DateTimeField(auto_now_add=True)
+
 
     def __str__(self):
         return f'{self.name} область'
@@ -47,8 +47,6 @@ class Tournaments(models.Model):
     link = models.URLField(blank=True, verbose_name="посилання на офіційний сайт")
     logotype = models.ImageField(upload_to='footballs/static/footballs/img/logo_tournaments/', verbose_name="Логотип",
                                  blank=True, default='footballs/static/footballs/img/logo_teams/Снимок.PNG')
-    date_create = models.DateTimeField(auto_now_add=True)
-    date_update = models.DateTimeField(auto_now=True)
 
     objects = models.Manager
 
@@ -80,8 +78,6 @@ class Teams(models.Model):
     born = models.IntegerField(blank=True, null=True, validators=[MinValueValidator(1940)],
                                verbose_name="Рік заснування")
     stadium = models.CharField(max_length=50, blank=True, verbose_name="Домашній стадіон")
-    date_create = models.DateTimeField(auto_now_add=True)
-    date_update = models.DateTimeField(auto_now=True)
 
     objects = models.Manager
 
@@ -109,8 +105,6 @@ class Standings(models.Model):
     tournament = models.ForeignKey(Tournaments, on_delete=models.PROTECT, verbose_name="Назва турніру")
     season = models.CharField(max_length=10, verbose_name='Сезон')
     team = models.ManyToManyField(Teams, related_name='standings', verbose_name="Команди")
-    date_create = models.DateTimeField(auto_now_add=True)
-    date_update = models.DateTimeField(auto_now=True)
 
     def __str__(self):
         return f'{self.region} - {self.tournament} {self.season}'
@@ -134,27 +128,26 @@ class Matches(models.Model):
         ('tech_defeat', 'Тех. поразка'),
     )
 
-    match_date = models.DateField(blank=True, default='01.01.2023', verbose_name="Дата")
-    match_time = models.TimeField(blank=True, default='00:00', verbose_name="Час")
+    match_event = models.DateTimeField(blank=True, verbose_name="Дата")
     tournament = models.ForeignKey(Standings,
                                    on_delete=models.DO_NOTHING,
                                    related_name='matches',
                                    verbose_name="Турнір"
                                    )
-    host_team = models.ForeignKey(Teams,
+    team1 = models.ForeignKey(Teams,
                                   on_delete=models.DO_NOTHING,
-                                  related_name="teams_home",
+                                  related_name="teams1",
                                   verbose_name="Команда господар"
                                   )
-    visiting_team = models.ForeignKey(Teams,
+    team2 = models.ForeignKey(Teams,
                                       on_delete=models.DO_NOTHING,
-                                      related_name="teams_guests",
+                                      related_name="teams2",
                                       verbose_name="Команда гостей"
                                       )
-    host_goals = models.IntegerField(null=True, blank=True, verbose_name="Забити голи - господарі",
+    goals_team1 = models.IntegerField(null=True, blank=True, verbose_name="Забити голи - господарі",
                                           validators=[MinValueValidator(0),
                                                       MaxValueValidator(99)])
-    visiting_goals = models.IntegerField(null=True,  blank=True, verbose_name="Забити голи - гості",
+    goals_team2 = models.IntegerField(null=True,  blank=True, verbose_name="Забити голи - гості",
                                               validators=[MinValueValidator(0),
                                                           MaxValueValidator(99)])
     status = models.CharField(max_length=11, choices=STATUS_MATCH, blank=True, default='not_played',verbose_name="Статус")
@@ -163,11 +156,9 @@ class Matches(models.Model):
                               related_name='tour',
                               verbose_name="Тур"
                               )
-    date_create = models.DateTimeField(auto_now_add=True)
-    date_update = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return f'{self.tournament} |{self.round} | {self.host_team} {self.host_goals}:{self.visiting_goals} {self.visiting_team} | {self.status}'
+        return f'{self.tournament} |{self.round} | {self.team1} {self.goals_team1}:{self.goals_team2} {self.team2} | {self.status}'
 
     class Meta:
         verbose_name = "Матчі"

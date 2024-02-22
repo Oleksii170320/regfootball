@@ -15,7 +15,8 @@ def translit_to_eng(s: str) -> str:
 
 
 class Rounds(models.Model):
-    round = models.CharField(max_length=12, unique=True, verbose_name="Тур / стадія плей-оф")
+    round = models.CharField(max_length=20, unique=True, verbose_name="Тур / стадія плей-оф")
+    into_table = models.BooleanField(verbose_name='Play_off', default=True)
 
     def __str__(self):
         return f'{self.round}'
@@ -105,6 +106,7 @@ class Standings(models.Model):
     tournament = models.ForeignKey(Tournaments, on_delete=models.PROTECT, verbose_name="Назва турніру")
     season = models.CharField(max_length=10, verbose_name='Сезон')
     team = models.ManyToManyField(Teams, related_name='standings', verbose_name="Команди")
+    print_standing = models.BooleanField(verbose_name="Турнірна тааблиця", default=True)
 
     def __str__(self):
         return f'{self.region} - {self.tournament} {self.season}'

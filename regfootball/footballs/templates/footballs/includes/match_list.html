@@ -1,13 +1,13 @@
 <div class="card mb-3">
   <h4 class="card-header">Результати матчів:</h4>
 
-  {% for tournament in tournaments_name %}
+  {% for tournament in tournaments_name %}    <!-- Розподіл на турніри -->
     <div class="card-body">
       <article class="game-feed match-center" id="matchCenterBlock">
-          {% if league_title %}<h5 class="card-header">{{ tournament }}</h5>{% endif %}
+          {% if league_title %}<h5 class="top-bar">{{ tournament }}</h5>{% endif %}
 
-          {% for round in rounds %}
-            {% if round_title %}<h6 class="card-header">{{ round }}</h6>{% endif %}<!-- Розподіл на тури -->
+          {% for round in rounds%}
+            {% if round_title %}<h6 class="card-header">{{ round }}</h6>{% endif %}  <!-- Розподіл на тури -->
 
               <table class="table table-striped table-hover">
                 {% for match in matches %}         <!-- Розполіл на матчі в турах -->

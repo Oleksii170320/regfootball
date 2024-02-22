@@ -1,23 +1,55 @@
 {% extends 'base.html'%}
 
 {% block page_header %}
-  <h3>Список турнірів:</h3>
+  <h3>Поточні турніри:</h3>
 {% endblock page_header %}
 
 {% block content %}
-  <ul>
-    {% for tournament in tournaments %}
+
+
+<ul>
+    {% for tournament in standings %}
+      {% if tournament.season == tournaments_max.tournament_max %}
 
         <lo><h5>
           <a href="{{ tournament.get_absolute_url }}">
             <img src="{{ tournament.tournament.logotype.url }}" width="50">
-            {{ tournament.tournament.full_name }}-{{ tournament.season }}
+            {{ tournament.tournament.full_name }} - {{ tournament.season }}
           </a>
         </h5></lo>
-
+      {% endif %}
     {% empty %}
       <lo><h5>Жодного турніру не знайдено.</h5></lo>
     {% endfor %}
-  </ul>
-  <br>
+</ul>
+<br>
+<hr>
+    <h4>Архів результатів завершених турнірів</h4>
+
+{% for tournament in tournaments %}
+  <div class="dropdown">
+
+        <a class="dropdown-toggle" href="#" data-bs-toggle="dropdown">
+            <img src="{{ tournament.logotype.url }}" width="50">
+            <h7>{{ tournament.full_name }}</h7></button>
+            <span class="caret" ></span></a>
+
+                <ul class=>
+                    {% for year in standings %}
+                      {% if tournament.id == year.tournament.id %}
+                        <li>
+                          <a href="{{ year.get_absolute_url }}">{{ year.season }}</a>
+                        </li>
+                        {% endif %}
+
+                    {% endfor %}
+                </ul>
+
+
+  </div>
+{% endfor %}
+
+
 {% endblock content %}
+
+

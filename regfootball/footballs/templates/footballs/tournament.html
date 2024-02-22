@@ -3,10 +3,10 @@
  <!-- Блок: Заголовок турніру -->
 {% block page_header %}
   <h3>
-    {% for tournament in tournaments %}
+    {% for tournament in matches %}
       {% if forloop.first %}
-        <img src="/media/{{ tournament.tournament__logotype }}" width="100" alt="logo">
-        {{ tournament.tournament__full_name }} {{ tournament.season }}
+        <img src="/media/{{ tournament.tournament__tournament__logotype }}" width="80" alt="logo">
+        {{ tournament.tournament__tournament__full_name }} {{ tournament.tournament__season }}
       {% endif %}
     {% endfor %}
   </h3>
@@ -17,7 +17,7 @@
   <!-- Блок: Лого команд-учасниць турніру -->
   <div class="card-body" align="center">
 
-    {% for team in tournaments %}
+    {% for team in teams_logo %}
       <a href="{% url 'footballs:team' team.team__team_slug %}">
         <img src="/media/{{ team.team__logotype }}" width="100" alt="{{ team.team__name }}">
       </a>
@@ -26,56 +26,58 @@
   </div>
 
   <!-- Блок: Турнірна таблиця -->
-  <div class="card mb-3">
-    <h5 class="card-header">Турнірна таблиця</h5>
-    <div class="card-body">
-      <div class="sp-table-wrapper">
-        <table class="table table-striped table-hover">
-          <thead class="table-primary">
-            <tr>
-              <th class="data-rank">№</th>
-              <th class="data-logo"></th>
-              <th class="data-name">Команда</th>
-              <th class="data-p">І</th>
-              <th class="data-twoeightfivenine">В</th>
-              <th class="data-twoeightsixzero">Н</th>
-              <th class="data-twoeightsixone">П</th>
-              <th class="data-twoeightsixtwo"  align="center" width="100">МЗ-МП</th>
-              <th class="data-twoeightsixfour">Р</th>
-              <th class="data-twoeightsixfive">О</th>
-            </tr>
-          </thead>
+  {% if print_table %}
+    <div class="card mb-3">
+      <h5 class="card-header">Турнірна таблиця</h5>
+      <div class="card-body">
+        <div class="sp-table-wrapper">
+          <table class="table table-striped table-hover">
+            <thead class="table-primary">
+              <tr>
+                <th class="data-rank">№</th>
+                <th class="data-logo"></th>
+                <th class="data-name">Команда</th>
+                <th class="data-p">І</th>
+                <th class="data-twoeightfivenine">В</th>
+                <th class="data-twoeightsixzero">Н</th>
+                <th class="data-twoeightsixone">П</th>
+                <th class="data-twoeightsixtwo"  align="center" width="100">МЗ-МП</th>
+                <th class="data-twoeightsixfour">Р</th>
+                <th class="data-twoeightsixfive">О</th>
+              </tr>
+            </thead>
 
-          {% for tournament in tournaments|dictsortreversed:"points" %}
-            <tr>
-              <td class="data-rank">                                                   <!-- Нумерація рядків таблиці -->
-                {{ forloop.counter }}
-              </td>
+            {% for tournament in tournaments|dictsortreversed:"points" %}
+              <tr>
+                <td class="data-rank">                                                   <!-- Нумерація рядків таблиці -->
+                  {{ forloop.counter }}
+                </td>
 
-              <td class="data-logo">                                                   <!-- Лого команди -->
-                <a href="{% url 'footballs:team' tournament.team__team_slug %}">
-                  <img src="/media/{{ tournament.team__logotype }}" height="40" alt="logo">
-                </a>
-              </td>
-
-              <td class="data-name" >                                                  <!-- Назва команди -->
-                  <a href="{% url 'footballs:team' tournament.team__team_slug %}">
-                    <strong>{{ tournament.team__name }}</strong>
+                <td class="data-logo">                                                   <!-- Лого команди -->
+                  <a href="{% url 'footballs:team' tournament.team_slug %}">
+                    <img src="/media/{{ tournament.logotype }}" height="40" alt="logo">
                   </a>
-              </td>
-              <td class="data-p">{{ tournament.count_matches }}</td>                   <!-- Кількість зіграних матчів -->
-              <td class="data-twoeightfivenine">{{ tournament.count_wins }}</td>       <!-- Кількість перемог -->
-              <td class="data-twoeightsixzero">{{ tournament.count_draws }}</td>        <!-- Кількість нічиїх -->
-              <td class="data-twoeightsixone">{{ tournament.count_defeats }}</td>       <!-- Кількість поразок -->
-              <td class="data-twoeightsixtwo" align="center">{{ tournament.goals_scored }}-{{ tournament.goals_conceded }}</td>  <!-- Забиті пропущені м'ячі -->
-              <td class="data-twoeightsixfour">{{ tournament.goals_difference }}</td>  <!-- Різниця м'ячів -->
-              <td class="data-twoeightsixfive">{{ tournament.points }}</td>            <!-- КЗалікові бали -->
-            </tr>
-          {% endfor %}
-        </table>
-     </div>
+                </td>
+
+                <td class="data-name" >                                                  <!-- Назва команди -->
+                    <a href="{% url 'footballs:team' tournament.team_slug %}">
+                      <strong>{{ tournament.name }}</strong>
+                    </a>
+                </td>
+                <td class="data-p">{{ tournament.count_matches }}</td>                   <!-- Кількість зіграних матчів -->
+                <td class="data-twoeightfivenine">{{ tournament.count_wins }}</td>       <!-- Кількість перемог -->
+                <td class="data-twoeightsixzero">{{ tournament.count_draws }}</td>        <!-- Кількість нічиїх -->
+                <td class="data-twoeightsixone">{{ tournament.count_defeats }}</td>       <!-- Кількість поразок -->
+                <td class="data-twoeightsixtwo" align="center">{{ tournament.goals_scored }}-{{ tournament.goals_conceded }}</td>  <!-- Забиті пропущені м'ячі -->
+                <td class="data-twoeightsixfour">{{ tournament.goals_difference }}</td>  <!-- Різниця м'ячів -->
+                <td class="data-twoeightsixfive">{{ tournament.points }}</td>            <!-- КЗалікові бали -->
+              </tr>
+            {% endfor %}
+          </table>
+       </div>
+      </div>
     </div>
-  </div>
+  {% endif %}
 
   <!-- Блок: Результати/календар матчів турніру -->
   {% include 'footballs/includes/match_list.html' %}
